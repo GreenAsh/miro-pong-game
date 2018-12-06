@@ -1,0 +1,127 @@
+<!DOCTYPE HTML>
+<html>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+
+<body>
+<style>
+    .container {
+        margin-top: 40px;
+    }
+
+    .api-request {
+        margin-bottom: 40px;
+        background-color: aliceblue;
+        border-radius: 4px;
+        padding: 20px;
+    }
+
+    h2 {
+        color: #666;
+        margin-left: 20px;
+        margin-top: 40px;
+        margin-bottom: 20px;
+    }
+</style>
+<div class="container">
+
+    <!-- Does not ready yet -->
+
+    <h1>Playground</h1>
+
+    <h2>Boards API</h2>
+
+    <div class="api-request">
+        <button type="submit" class="btn btn-primary">Get all user boards</button>
+    </div>
+
+    <div class="api-request">
+        <div class="input-group input-group-sm mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Board name</span>
+            </div>
+            <input type="email" class="form-control" placeholder="Untitled">
+        </div>
+        <button type="submit" class="btn btn-primary">Create board</button>
+    </div>
+
+    <div class="api-request">
+        <div class="input-group input-group-sm mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Board ID</span>
+            </div>
+            <input type="email" class="form-control" placeholder="Smth like: o9J_k1IhUfY=">
+        </div>
+        <div class="input-group input-group-sm mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text">New board name</span>
+            </div>
+            <input type="email" class="form-control" placeholder="">
+        </div>
+        <div class="input-group input-group-sm mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text">sharingPolicy.access</span>
+            </div>
+            <select class="custom-select custom-select-sm">
+                <option value="private">private</option>
+                <option value="view">view</option>
+                <option value="comment">comment</option>
+            </select>
+        </div>
+        <div class="input-group input-group-sm mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text">sharingPolicy.accountAccess</span>
+            </div>
+            <select class="custom-select custom-select-sm">
+                <option value="private">private</option>
+                <option value="view">view</option>
+                <option value="comment">comment</option>
+                <option value="edit">edit</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Update board</button>
+    </div>
+
+    <div class="api-request">
+        <div class="input-group input-group-sm mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Board ID</span>
+            </div>
+            <input type="email" class="form-control" placeholder="Smth like: o9J_k1IhUfY=">
+        </div>
+        <div class="input-group input-group-sm mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Emails</span>
+            </div>
+            <input type="email" class="form-control" placeholder="Enter comma-separated emails">
+        </div>
+        <button type="submit" class="btn btn-primary">Share board</button>
+    </div>
+
+    <div class="api-request">
+        <div class="input-group input-group-sm mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Board ID</span>
+            </div>
+            <input type="email" class="form-control" placeholder="Smth like: o9J_k1IhUfY=">
+        </div>
+        <button type="submit" class="btn btn-primary">Delete board</button>
+    </div>
+
+    <h2>Accounts API</h2>
+
+    <div class="api-request">
+        <button type="submit" class="btn btn-primary">Get current account</button>
+    </div>
+
+    <div class="api-request">
+        <div class="input-group input-group-sm mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Emails</span>
+            </div>
+            <input type="email" class="form-control" placeholder="Enter comma-separated emails">
+        </div>
+        <button type="submit" class="btn btn-primary">Invite users to current account</button>
+    </div>
+</div>
+</body>
+</html>

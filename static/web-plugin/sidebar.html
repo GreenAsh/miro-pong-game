@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<link rel="stylesheet" type="text/css" href="https://realtimeboard.com/app/static/rtb.uikit.css">
+	<script src="https://realtimeboard.com/app/static/rtb.sdk.1.0.js"></script>
+
+	<style>
+		.rtb-sidebar-caption {
+			font-size: 14px;
+			font-weight: bold;
+			color: rgba(0, 0, 0, 0.8);
+			padding: 24px 0 0 24px;
+		}
+
+		.actions {
+			padding: 20px 24px 0 24px;
+		}
+
+		button {
+			height: 32px;
+			border-radius: 4px;
+			font-size: 12px;
+			font-weight: bold;
+			line-height: 30px;
+			text-align: center;
+			color: #fff;
+			min-width: 65px;
+			background-color: #2a79ff;
+			overflow: hidden;
+			text-overflow: ellipsis;
+		}
+	</style>
+</head>
+
+<body>
+	<div class="rtb-sidebar-caption">Ping-pong</div>
+	<div class="actions">
+		<center>
+			<br><br>
+			<button onclick="run()" style="width: 120px;">Play!</button>
+			<br><br>
+			<h2 id="controls" style="display:none;">Use up/down arrows and A/Z keys to control pad</h2>
+			<h2 id="you-are-dead" style="display:none; background-color: red;">You are dead, reopen sidebar and click 'Play'!</h2>
+			<h2 id="click-for-focus" style="display:none;">Click on sidebar <br>to control pad</h2>
+		</center>
+	</div>
+
+	<script>
+		'use strict'
+
+		//---CONSTANTS---
+		const B = 0 //background
+		const P_1 = 1 //player 1 pad
+		const P_2 = 2 //player 2 pad
+		const BL = 3 //ball
+
+		//directions
+		const UR = 0
+		const UL = 1
+		const DL = 2
+		const DR = 3
+		const UP = 4
+		const DOWN = 5
+
+		//gameStates
+		const READY = 0
+		const PLAYING = 1
+		const GAME_OVER = 2
+
+		const initDelay = 200
+		const minDelay = 10
+
+		const BACK_COLOR = '#000000'
+		const P_1_COLOR = '#A32F2F'
+		const P_2_COLOR = '#05668D'
+		const BL_COLOR = '#75DEC7'
+		//---CONSTANTS END---
+
+		//---GAME STATE---
+		let ballDelay = initDelay
+		let ballDirection = Math.floor(Math.random() * 4)
+
+		let gridState = [
+			[B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B],
+			[B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B],
+			[B, B, B, B, B, B, B, B, B, BL, B, B, B, B, B, B, B, B, B],
+			[B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, P_2],
+			[P_1, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, P_2],
+			[P_1, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, P_2],
+			[P_1, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B],
+			[B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B],
+			[B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B],
+			[B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B]
+		]
+
+		let gridView = []
+		//---GAME STATE END---
+
+		async function setUp() {
+			const promises = []
+
+			const BLOCK_SIZE = 200
+			let background = {
+				width: BLOCK_SIZE - 3,
+				height: BLOCK_SIZE - 3,
+				text: 'B',
+				style: {
+					borderWidth: 0,
+					backgroundColor: BACK_COLOR,
+					textColor: BACK_COLOR
+				}
+			}
+			let player1 = {
+				width: BLOCK_SIZE - 3,
+				height: BLOCK_SIZE - 3,
+				text: 'P_1',
+				style: {
+					borderWidth: 0,
+					backgroundColor: '#A32F2F',
+					textColor: '#A32F2F'
+				}
+			}
+			let player2 = {
+				width: BLOCK_SIZE - 3,
+				height: BLOCK_SIZE - 3,
+				text: 'P_2',
+				style: {
+					borderWidth: 0,
+					backgroundColor: P_2_COLOR,
+					textColor: P_2_COLOR
+				}
+			}
+			let ball = {
+				width: BLOCK_SIZE - 3,
+				height: BLOCK_SIZE - 3,
+				text: ballDirection.toString(),
+				style: {
+					borderWidth: 0,
+					backgroundColor: BL_COLOR,
+					textColor: BL_COLOR
+				}
+			}
+
+			let data
+			for (let x = 0; x < gridState[0].length; x++) {
+				for (let y = 0; y < gridState.length; y++) {
+					if (promises[y] == undefined) {
+						promises[y] = []
+					}
+					switch (gridState[y][x]) {
+						case B:
+							data = background
+							break
+						case P_1:
+							data = player1
+							break
+						case P_2:
+							data = player2
+							break
+						case BL:
+							data = ball
+							break;
+					}
+
+					promises[y][x] = rtb.board.widgets.shapes.create(Object.assign({},
+						data,
+						{
+							x: BLOCK_SIZE * x,
+							y: BLOCK_SIZE * y
+						}
+					))
+				}
+			}
+
+			for (let x = 0; x < promises[0].length; x++) {
+				for (let y = 0; y < promises.length; y++) {
+					if (gridView[y] == undefined) {
+						gridView[y] = []
+					}
+					gridView[y][x] = await promises[y][x]
+				}
+			}
+		}
+
+		async function run() {
+			setUp()
+
+			window.addEventListener('keypress', (e) => {
+				switch (e.keyCode) {
+					case 38:	//up
+						movePlayer(P_2, UP)
+						break
+					case 40:	//down
+						movePlayer(P_2, DOWN)
+						break
+					case 65:	//a
+						movePlayer(P_1, UP)
+						break
+					case 90:	//z
+						movePlayer(P_1, DOWN)
+						break
+				}
+				e.preventDefault()
+				e.stopPropagation()
+			})
+
+
+			requestAnimationFrame(tick)
+
+			function tick() {
+				parseGridView()
+				requestAnimationFrame(tick)
+			}
+		}
+
+		function waitMilliseconds(ms) {
+			return new Promise((resolve) => {
+				setTimeout(resolve, ms)
+			})
+		}
+
+		function movePlayer(player, direction) {
+
+		}
+
+		//From widgets to state
+		function parseGridView() {
+			let ballFound = false
+			gridState = [
+				[B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B],
+				[B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B],
+				[B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B],
+				[B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B],
+				[B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B],
+				[B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B],
+				[B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B],
+				[B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B],
+				[B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B],
+				[B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B]
+			]
+			for (let y = 0; y < gridView.length; y++) {
+				switch (gridView[y][0].text) {
+					case 'P_1':
+						gridState[y][0] = P_1
+						break
+					case UR:
+					case UL:
+					case DL:
+					case DR:
+						ballDirection = Number(gridView[y][0].text)
+						gridState[y][0] = BL
+						ballFound = true
+						break
+				}
+				switch (gridView[y][gridView[0].length].text) {
+					case 'P_1':
+						gridState[y][gridView[0].length] = P_2
+						break
+					case UR:
+					case UL:
+					case DL:
+					case DR:
+						ballDirection = Number(gridView[y][0].text)
+						gridState[y][gridView[0].length] = BL
+						ballFound = true
+						break
+				}
+			}
+
+			if (!ballFound) {
+				for (let x = 1; x < gridView[0].length - 1; x++) {
+					for (let y = 0; y < gridView.length; y++) {
+						if (!ballFound) {
+							switch (gridView[y][x].text) {
+								case UR:
+								case UL:
+								case DL:
+								case DR:
+									ballDirection = Number(gridView[y][0].text)
+									gridState[y][x] = BL
+									ballFound = true
+									break
+							}
+						} else {
+							break;
+						}
+					}
+					if (ballFound) { break }
+				}
+			}
+		}
+
+		//From state to widgets
+		function updateGridView() {
+			let view
+			let state
+			for (let x = 0; x < gridView[0].length; x++) {
+				for (let y = 0; y < gridView.length; y++) {
+					view = gridView[y][x]
+					state = gridState[y][x]
+					if (!equals(view, state)) {
+						switch (state) {
+							case B:
+								rtb.board.widgets.shapes.update(view.id, {
+									text: 'B',
+									style: {
+										borderWidth: 0,
+										backgroundColor: BACK_COLOR,
+										textColor: BACK_COLOR
+									}
+								})
+								break
+							case P_1:
+							rtb.board.widgets.shapes.update(view.id, {
+									text: 'B',
+									style: {
+										borderWidth: 0,
+										backgroundColor: BACK_COLOR,
+										textColor: BACK_COLOR
+									}
+								})
+								break
+								case P_1:
+							rtb.board.widgets.shapes.update(view.id, {
+									text: 'B',
+									style: {
+										borderWidth: 0,
+										backgroundColor: BACK_COLOR,
+										textColor: BACK_COLOR
+									}
+								})
+								break
+								case P_1:
+							rtb.board.widgets.shapes.update(view.id, {
+									text: 'B',
+									style: {
+										borderWidth: 0,
+										backgroundColor: BACK_COLOR,
+										textColor: BACK_COLOR
+									}
+								})
+								break
+						}
+					}
+				}
+			}
+		}
+
+		function equals(view, state) {
+			switch (view.text) {
+				case UR:
+				case UL:
+				case DL:
+				case DR:
+					return state === BL && Number(view.text) === ballDirection
+				case 'P_1':
+					return state === P_1
+				case 'P_2':
+					return state === P_2
+				case 'B':
+					return state === B
+			}
+		}
+	</script>
+</body>
+
+</html>
