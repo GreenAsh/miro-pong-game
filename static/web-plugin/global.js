@@ -1,6 +1,7 @@
 const BLOCK_COLOR = '#000000'
 const PAD_COLOR = '#A32F2F'
 const BALL_COLOR = '#05668D'
+const FRAME_COLOR = '#219B00'
 
 const gridInit = [
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -42,8 +43,33 @@ const ballDraft = {
         textColor: BALL_COLOR
     }
 }
+const verticalFrame = {
+    width: BLOCK_STEP,
+    height: BLOCK_STEP * 17,
+    text: '',
+    style: {
+        borderWidth: 0,
+        backgroundColor: FRAME_COLOR,
+        textColor: FRAME_COLOR
+    }
+}
+const horizontalFrame = {
+    width: BLOCK_STEP * gridInit[0].length,
+    height: BLOCK_STEP,
+    text: '',
+    style: {
+        borderWidth: 0,
+        backgroundColor: FRAME_COLOR,
+        textColor: FRAME_COLOR
+    }
+}
 
 let brickWidgets = []
+
+let leftFrameWidget = {}
+let rightFrameWidget = {}
+let upFrameWidget = {}
+let downFrameWidget = {}
 
 let currentPlayer = {
     movingLeft: false,
