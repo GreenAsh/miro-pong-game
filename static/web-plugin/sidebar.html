@@ -67,6 +67,17 @@
 				e.stopPropagation()
 			})
 
+			window.addEventListener('keyup', (e) => {
+				switch (e.keyCode) {
+					case 37:
+					case 39:
+						stopMovePad()
+						break
+				}
+				e.preventDefault()
+				e.stopPropagation()
+			})
+
 			requestAnimationFrame(tick)
 
 			function tick() {
@@ -74,14 +85,22 @@
 			}
 		}
 
-		function waitMilliseconds(ms) {
-			return new Promise((resolve) => {
-				setTimeout(resolve, ms)
-			})
+		function movePad(direction) {
+			switch (direction) {
+				case 'left':
+					currentPlayer.movingLeft = true
+					currentPlayer.movingRight = false
+					break
+				case 'right':
+					currentPlayer.movingLeft = false
+					currentPlayer.movingRight = true
+					break
+			}
 		}
 
-		function movePad(direction) {
-			console.log(direction)
+		function stopMovePad() {
+			currentPlayer.movingLeft = false
+			currentPlayer.movingRight = false
 		}
 	</script>
 </body>

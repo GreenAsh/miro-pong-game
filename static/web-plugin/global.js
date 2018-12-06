@@ -74,11 +74,20 @@ let downFrameWidget = {}
 let currentPlayer = {
     movingLeft: false,
     movingRight: false,
-    widget:{}
+    widget:{},
+    processMoving: function() {
+        
+    }
 }
 
 let ball = {
     angle: 45,
     speed: 0,
     widget:{}
+}
+
+function waitMilliseconds(ms) {
+    return new Promise((resolve) => {
+        setTimeout(resolve, ms)
+    })
 }
