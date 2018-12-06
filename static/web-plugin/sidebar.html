@@ -33,7 +33,8 @@
 		}
 	</style>
 	<script src="global.js"></script>
-	<script src="mapA.js"></script>
+	<script src="mapData.js"></script>
+	<script src="engineAndMap.js"></script>
 	<script src="setup.js"></script>
 	<script src="input.js"></script>
 </head>
@@ -44,6 +45,7 @@
 		<center>
 			<br><br>
 			<button onclick="run()" style="width: 120px;">Play!</button>
+			<button onclick="join()" style="width: 120px;">Join!</button>
 			<br><br>
 			<h2 id="controls" style="display:none;">Use up/down arrows and A/Z keys to control pad</h2>
 			<h2 id="you-are-dead" style="display:none; background-color: red;">You are dead, reopen sidebar and click 'Play'!</h2>
@@ -53,29 +55,46 @@
 	<script>
 		'use strict'
 
-		var direction = {x : 1, y: 0};
+		var direction = {x : -1, y: -1};
 		async function run() {
-			await renderer.init().finally(() => {
-				// var a = setInterval(() => {
-				// 	if (world.pad.move(direction.x, direction.y)){
-				// 		renderer.redrawMap();
-				// 	} else {
-				// 		if (direction.x === 1){
-				// 			direction = {x : 0, y: -1};
-				// 		} else if (direction.y === -1){
-				// 			direction = {x : -1, y: 0};
-				// 		} else if (direction.x === -1){
-				// 			direction = {x : 0, y: 1};
-				// 		} else {
-				// 			direction = {x : 1, y: 0};
-				// 		}
-				// 		if (world.pad.move(direction.x, direction.y)){
-				// 			renderer.redrawMap();
-				// 		}
-				// 	}
-				// }, 100);
-				// setTimeout(() => {clearInterval(a)}, 20000);
-			});
+			await renderer.init();
+			var a = setInterval(() => {
+				if (world.ball.move(direction.x, direction.y)){
+					renderer.redrawMap();
+				} else {
+					const x = direction.x
+					const width = world.ball.width
+					if (world.ball.getCurPos().x + x < 0 || (world.ball.getCurPos().x + x + width) > WIDTH || world.map[world.ball.getCurPos().x + x][world.ball.getCurPos().y] !== VOID){
+						direction.x = -x;
+					}
+					const y = direction.y
+					const height = world.ball.height
+					if (world.ball.getCurPos().y + y < 0 || (world.ball.getCurPos().y + y + height) > HEIGHT || world.map[world.ball.getCurPos().x][world.ball.getCurPos().y + y] !== VOID){
+						direction.y = -y;
+					}
+					if (world.ball.move(direction.x, direction.y)){
+						renderer.redrawMap();
+					} else {
+						direction.x = -x;
+						direction.y = -y;
+						if (world.ball.move(direction.x, direction.y)){
+							renderer.redrawMap();
+						}
+					}
+				}
+			}, 200);
+			setTimeout(() => {clearInterval(a)}, 20000);
+			input.init();
+		}
+		function join() {
+			if (world.shapes.length === 0){
+				this.createWidgets(viewport.x + viewport.width, viewport.y + viewport.height);
+				//await rtb.board.setViewportWithAnimation({x: viewport.x - BLOCK_SIZE, y: viewport.y - BLOCK_SIZE, width: (WIDTH + 1) * BLOCK_SIZE, height: (HEIGHT + 1) * BLOCK_SIZE})
+			} else {
+				mapDeepCopy(world.initialMap, world.dirtyMap);
+			}
+			world.pads[1].init(4, 17);
+			input.init();
 		}
 	</script>
 </body>

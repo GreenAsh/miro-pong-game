@@ -1,38 +1,33 @@
-function bindControls(){
-	document.onkeydown = function(e) {
-		e = e || window.event;
-		switch(e.which) {
-			case 37: // left
-				console.log('left');
-				rtb.board.transformDelta(ball.widget.id, -BLOCK_STEP, 0);
-				break;
-			case 38: // up
-				console.log('up');
-				rtb.board.transformDelta(ball.widget.id, 0, -BLOCK_STEP);
-				break;
-			case 39: // right
-				console.log('right');
-				rtb.board.transformDelta(ball.widget.id, BLOCK_STEP, 0);
-				break;
-			case 40: // down
-				console.log('down');
-				rtb.board.transformDelta(ball.widget.id, 0, BLOCK_STEP);
-				break;
-			default:
-				return; // exit this handler for other keys
+var input = {
+	init: function () {
+		document.onkeydown = async function (e) {
+			e = e || window.event;
+			switch (e.which) {
+				case 37: // left
+					if (world.pads[1].move(-1, 0)) {
+						await renderer.redrawMap();
+					}
+					break;
+				case 39: // right
+					if (world.pads[1].move(1, 0)) {
+						await renderer.redrawMap();
+					}
+					break;
+				case 90: // left
+					if (world.pads[0].move(-1, 0)) {
+						await renderer.redrawMap();
+					}
+					break;
+				case 88: // right
+					if (world.pads[0].move(1, 0)) {
+						await renderer.redrawMap();
+					}
+					break;
+				default:
+					console.log(e.which);
+					return; // exit this handler for other keys
+			}
+			e.preventDefault(); // prevent the default action (scroll / move caret)
 		}
-		e.preventDefault(); // prevent the default action (scroll / move caret)
 	}
 }
-
-function initModule(){
-	bindControls();
-}
-
-initModule();
-
-
-let pad = {
-	movingLeft: function(){
-	}
-};
