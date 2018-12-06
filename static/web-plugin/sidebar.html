@@ -61,7 +61,7 @@
 					}
 					switch (gridInit[y][x]) {
 						case 0:
-							data = block
+							data = blockDraft
 							break
 					}
 					promises[y][x] = rtb.board.widgets.shapes.create(Object.assign({},
@@ -82,6 +82,29 @@
 					brickWidgets[y][x] = await promises[y][x]
 				}
 			}
+
+			await spawnPad()
+			await spawnBall()
+		}
+
+		async function spawnPad() {
+			await rtb.board.widgets.shapes.create(Object.assign({},
+				padDraft,
+				{
+					x: BLOCK_STEP * Math.floor(gridInit / 2) - BLOCK_STEP,
+					y: BLOCK_STEP * 14
+				}
+			))
+		}
+
+		async function spawnBall() {
+			await rtb.board.widgets.shapes.create(Object.assign({},
+				ballDraft,
+				{
+					x: BLOCK_STEP * Math.floor(gridInit / 2),
+					y: BLOCK_STEP * 13
+				}
+			))
 		}
 
 		async function run() {

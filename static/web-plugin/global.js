@@ -12,7 +12,7 @@ const gridInit = [
 
 const BLOCK_SIZE = 190
 const BLOCK_STEP = 200
-const block = {
+const blockDraft = {
     width: BLOCK_SIZE,
     height: BLOCK_SIZE,
     text: '',
@@ -20,6 +20,26 @@ const block = {
         borderWidth: 0,
         backgroundColor: BLOCK_COLOR,
         textColor: BLOCK_COLOR
+    }
+}
+const padDraft = {
+    width: BLOCK_STEP * 3,
+    height: BLOCK_SIZE,
+    text: '',
+    style: {
+        borderWidth: 0,
+        backgroundColor: PAD_COLOR,
+        textColor: PAD_COLOR
+    }
+}
+const ballDraft = {
+    width: BLOCK_SIZE,
+    height: BLOCK_SIZE,
+    text: '',
+    style: {
+        borderWidth: 0,
+        backgroundColor: BALL_COLOR,
+        textColor: BALL_COLOR
     }
 }
 
