@@ -33,9 +33,9 @@
 		}
 	</style>
 	<script src="global.js"></script>
+	<script src="mapA.js"></script>
 	<script src="setup.js"></script>
 	<script src="input.js"></script>
-	<script src="mapA.js"></script>
 </head>
 
 <body>
@@ -52,58 +52,30 @@
 	</div>
 	<script>
 		'use strict'
-		world.pad.setPosition(1, 1);
 
+		var direction = {x : 1, y: 0};
 		async function run() {
-			setUp()
-
-			window.addEventListener('keydown', (e) => {
-				switch (e.keyCode) {
-					case 37:
-						movePad('left')
-						break
-					case 39:
-						movePad('right')
-						break
-				}
-				e.preventDefault()
-				e.stopPropagation()
-			})
-
-			window.addEventListener('keyup', (e) => {
-				switch (e.keyCode) {
-					case 37:
-					case 39:
-						stopMovePad()
-						break
-				}
-				e.preventDefault()
-				e.stopPropagation()
-			})
-
-			requestAnimationFrame(tick)
-
-			function tick() {
-				requestAnimationFrame(tick)
-			}
-		}
-
-		function movePad(direction) {
-			switch (direction) {
-				case 'left':
-					currentPlayer.movingLeft = true
-					currentPlayer.movingRight = false
-					break
-				case 'right':
-					currentPlayer.movingLeft = false
-					currentPlayer.movingRight = true
-					break
-			}
-		}
-
-		function stopMovePad() {
-			currentPlayer.movingLeft = false
-			currentPlayer.movingRight = false
+			await renderer.init().finally(() => {
+				// var a = setInterval(() => {
+				// 	if (world.pad.move(direction.x, direction.y)){
+				// 		renderer.redrawMap();
+				// 	} else {
+				// 		if (direction.x === 1){
+				// 			direction = {x : 0, y: -1};
+				// 		} else if (direction.y === -1){
+				// 			direction = {x : -1, y: 0};
+				// 		} else if (direction.x === -1){
+				// 			direction = {x : 0, y: 1};
+				// 		} else {
+				// 			direction = {x : 1, y: 0};
+				// 		}
+				// 		if (world.pad.move(direction.x, direction.y)){
+				// 			renderer.redrawMap();
+				// 		}
+				// 	}
+				// }, 100);
+				// setTimeout(() => {clearInterval(a)}, 20000);
+			});
 		}
 	</script>
 </body>

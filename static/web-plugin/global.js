@@ -2,6 +2,7 @@ const BLOCK_COLOR = '#000000'
 const PAD_COLOR = '#A32F2F'
 const BALL_COLOR = '#05668D'
 const FRAME_COLOR = '#219B00'
+const VOID_COLOR = '#ffffff'
 
 const gridInit = [
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
