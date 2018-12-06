@@ -91,7 +91,7 @@
 			await rtb.board.widgets.shapes.create(Object.assign({},
 				padDraft,
 				{
-					x: BLOCK_STEP * Math.floor(gridInit / 2) - BLOCK_STEP,
+					x: BLOCK_STEP * Math.floor(gridInit[0].length / 2),
 					y: BLOCK_STEP * 14
 				}
 			))
@@ -101,7 +101,7 @@
 			await rtb.board.widgets.shapes.create(Object.assign({},
 				ballDraft,
 				{
-					x: BLOCK_STEP * Math.floor(gridInit / 2),
+					x: BLOCK_STEP * Math.floor(gridInit[0].length / 2),
 					y: BLOCK_STEP * 13
 				}
 			))
