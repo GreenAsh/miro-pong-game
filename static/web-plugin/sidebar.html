@@ -53,19 +53,6 @@
 		async function setUp() {
 			const promises = []
 
-			const BLOCK_SIZE = 190
-			const BLOCK_STEP = 200
-			let block = {
-				width: BLOCK_SIZE,
-				height: BLOCK_SIZE,
-				text: '',
-				style: {
-					borderWidth: 0,
-					backgroundColor: BLOCK_COLOR,
-					textColor: BLOCK_COLOR
-				}
-			}
-
 			let data
 			for (let x = 0; x < gridInit[0].length; x++) {
 				for (let y = 0; y < gridInit.length; y++) {
@@ -89,10 +76,10 @@
 
 			for (let x = 0; x < promises[0].length; x++) {
 				for (let y = 0; y < promises.length; y++) {
-					if (gameWidgets[y] == undefined) {
-						gameWidgets[y] = []
+					if (brickWidgets[y] == undefined) {
+						brickWidgets[y] = []
 					}
-					gameWidgets[y][x] = await promises[y][x]
+					brickWidgets[y][x] = await promises[y][x]
 				}
 			}
 		}
