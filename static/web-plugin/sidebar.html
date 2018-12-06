@@ -32,6 +32,7 @@
 			text-overflow: ellipsis;
 		}
 	</style>
+	<script src="global.js"></script>
 </head>
 
 <body>
@@ -46,23 +47,8 @@
 			<h2 id="click-for-focus" style="display:none;">Click on sidebar <br>to control pad</h2>
 		</center>
 	</div>
-
 	<script>
 		'use strict'
-
-		const BLOCK_COLOR = '#000000'
-		const PAD_COLOR = '#A32F2F'
-		const BALL_COLOR = '#05668D'
-
-		const gridInit = [
-			[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-			[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-			[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-			[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-			[0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-		]
-
-		let gameWidgets = []
 
 		async function setUp() {
 			const promises = []
