@@ -271,8 +271,11 @@ var renderer = {
 		// 	await promeses[i];
 		// }
 	},
-	redrawMap: async function (force) {
+	redrawMap: async function (force, maxWidth) {
 		var objects = [];
+		if (!maxWidth){
+			maxWidth = WIDTH;
+		}
 		for (var i = 0; i < WIDTH; i++) {
 			for (var j = 0; j < HEIGHT; j++) {
 				if (world.dirtyMap[i][j] !== world.map[i][j] || force === true){

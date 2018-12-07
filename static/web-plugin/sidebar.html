@@ -102,6 +102,14 @@
 					case STARTED:
 						if (app.started === false) {
 							app.started = true;
+							if (app.joined) {
+								//ToDo alalala
+								// mapDeepCopy(world.initialMap, world.dirtyMap);
+								// world.ball.init(5, 16);
+								// world.pads[0].init(4, 1);
+								// world.pads[1].init(4, 17);
+								input.asClient(app);
+							}
 							if (app.hosted === true) {
 								input.asHost();
 								app.ballDirection = {x: -1, y: -1};
@@ -132,9 +140,6 @@
 										}
 									}
 								}, 100);
-							}
-							if (app.joined) {
-								input.asClient(app);
 							}
 							message = "Game is started";
 						}
