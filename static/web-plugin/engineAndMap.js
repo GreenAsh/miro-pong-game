@@ -14,22 +14,49 @@ var world = {
 		mapView: [[PAD], [PAD], [PAD]],
 		clearView: [[VOID], [VOID], [VOID]],
 		currentPos: {x: 0, y: 0},
+		shapesView: PADS_SHAPES[0],
 		canSetObjectView: function (){},
 		init: function (x, y) {
 			this.canSetObjectView = world.canSetObjectView;
 			if (this.canSetObjectView(x, y, this.mapView, this.width, this.height, world.map)){
 				this.setCurPos(x, y);
 				world.fillView(this.getCurPos().x, this.getCurPos().y, this.mapView, this.width, this.height, world.dirtyMap);
+				world.fillView(this.getCurPos().x, this.getCurPos().y, this.shapesView, this.width, this.height, world.shapes);
+				this.render();
 			}
 		},
 		move: function(deltaX, deltaY){
 			if (this.canSetObjectView(this.getCurPos().x + deltaX, this.getCurPos().y + deltaY, this.mapView, this.width, this.height, world.map)) {
 				world.fillView(this.getCurPos().x, this.getCurPos().y, this.clearView, this.width, this.height, world.dirtyMap);
+				world.fillView(this.getCurPos().x, this.getCurPos().y, this.clearView, this.width, this.height, world.shapes);
 				this.setCurPos(this.getCurPos().x + deltaX, this.getCurPos().y + deltaY);
 				world.fillView(this.getCurPos().x, this.getCurPos().y, this.mapView, this.width, this.height, world.dirtyMap);
+				world.fillView(this.getCurPos().x, this.getCurPos().y, this.shapesView, this.width, this.height, world.shapes);
+
+				var objects = [];
+				for (var i = 0; i < this.width; i++){
+					for (var j = 0; j < this.height; j++){
+						objects.push(this.shapesView[i][j]);
+					}
+				}
+				rtb.board.transformDelta(objects, BLOCK_STEP * deltaX, BLOCK_STEP * deltaY);
 				return true;
 			}
 			return false;
+		},
+		render: async function(){
+			let objects = [];
+			for (var i = 0; i < this.width; i++){
+				for (var j = 0; j < this.height; j++){
+					objects.push(rtb.board.widgets.shapes.update(this.shapesView[i][j], {
+						x: BLOCK_STEP * (this.getCurPos().x + i),
+						y: BLOCK_STEP * (this.getCurPos().y + j)
+					}));
+				}
+			}
+			for (var i = 0; i < objects.length; i++){
+				await objects[i];
+			}
 		},
 		getCurPos: function(){
 			return this.currentPos;
@@ -44,22 +71,49 @@ var world = {
 		mapView: [[PAD], [PAD], [PAD]],
 		clearView: [[VOID], [VOID], [VOID]],
 		currentPos: {x: 0, y: 0},
+		shapesView: PADS_SHAPES[1],
 		canSetObjectView: function (){},
 		init: function (x, y) {
 			this.canSetObjectView = world.canSetObjectView;
 			if (this.canSetObjectView(x, y, this.mapView, this.width, this.height, world.map)){
 				this.setCurPos(x, y);
 				world.fillView(this.getCurPos().x, this.getCurPos().y, this.mapView, this.width, this.height, world.dirtyMap);
+				world.fillView(this.getCurPos().x, this.getCurPos().y, this.shapesView, this.width, this.height, world.shapes);
+				this.render();
 			}
 		},
 		move: function(deltaX, deltaY){
 			if (this.canSetObjectView(this.getCurPos().x + deltaX, this.getCurPos().y + deltaY, this.mapView, this.width, this.height, world.map)) {
 				world.fillView(this.getCurPos().x, this.getCurPos().y, this.clearView, this.width, this.height, world.dirtyMap);
+				world.fillView(this.getCurPos().x, this.getCurPos().y, this.clearView, this.width, this.height, world.shapes);
 				this.setCurPos(this.getCurPos().x + deltaX, this.getCurPos().y + deltaY);
 				world.fillView(this.getCurPos().x, this.getCurPos().y, this.mapView, this.width, this.height, world.dirtyMap);
+				world.fillView(this.getCurPos().x, this.getCurPos().y, this.shapesView, this.width, this.height, world.shapes);
+
+				var objects = [];
+				for (var i = 0; i < this.width; i++){
+					for (var j = 0; j < this.height; j++){
+						objects.push(this.shapesView[i][j]);
+					}
+				}
+				rtb.board.transformDelta(objects, BLOCK_STEP * deltaX, BLOCK_STEP * deltaY);
 				return true;
 			}
 			return false;
+		},
+		render: async function(){
+			let objects = [];
+			for (var i = 0; i < this.width; i++){
+				for (var j = 0; j < this.height; j++){
+					objects.push(rtb.board.widgets.shapes.update(this.shapesView[i][j], {
+						x: BLOCK_STEP * (this.getCurPos().x + i),
+						y: BLOCK_STEP * (this.getCurPos().y + j)
+					}));
+				}
+			}
+			for (var i = 0; i < objects.length; i++){
+				await objects[i];
+			}
 		},
 		getCurPos: function(){
 			return this.currentPos;
@@ -75,22 +129,49 @@ var world = {
 		mapView: [[BALL]],
 		clearView: [[VOID]],
 		currentPos: {x:0,y:0},
+		shapesView: BALL_SHAPES,
 		canSetObjectView: function(){},
 		init: function(x, y){
 			this.canSetObjectView = world.canSetObjectView;
 			if (this.canSetObjectView(x, y, this.mapView, this.width, this.height, world.map)){
 				this.setCurPos(x, y);
 				world.fillView(this.getCurPos().x, this.getCurPos().y, this.mapView, this.width, this.height, world.dirtyMap);
+				world.fillView(this.getCurPos().x, this.getCurPos().y, this.shapesView, this.width, this.height, world.shapes);
+				this.render();
 			}
 		},
 		move: function(deltaX, deltaY){
 			if (this.canSetObjectView(this.getCurPos().x + deltaX, this.getCurPos().y + deltaY, this.mapView, this.width, this.height, world.map)) {
 				world.fillView(this.getCurPos().x, this.getCurPos().y, this.clearView, this.width, this.height, world.dirtyMap);
+				world.fillView(this.getCurPos().x, this.getCurPos().y, this.clearView, this.width, this.height, world.shapes);
 				this.setCurPos(this.getCurPos().x + deltaX, this.getCurPos().y + deltaY);
 				world.fillView(this.getCurPos().x, this.getCurPos().y, this.mapView, this.width, this.height, world.dirtyMap);
+				world.fillView(this.getCurPos().x, this.getCurPos().y, this.shapesView, this.width, this.height, world.shapes);
+
+				var objects = [];
+				for (var i = 0; i < this.width; i++){
+					for (var j = 0; j < this.height; j++){
+						objects.push(this.shapesView[i][j]);
+					}
+				}
+				rtb.board.transformDelta(objects, BLOCK_STEP * deltaX, BLOCK_STEP * deltaY);
 				return true;
 			}
 			return false;
+		},
+		render: async function(){
+			let objects = [];
+			for (var i = 0; i < this.width; i++){
+				for (var j = 0; j < this.height; j++){
+					objects.push(rtb.board.widgets.shapes.update(this.shapesView[i][j], {
+						x: BLOCK_STEP * (this.getCurPos().x + i),
+						y: BLOCK_STEP * (this.getCurPos().y + j)
+					}));
+				}
+			}
+			for (var i = 0; i < objects.length; i++){
+				await objects[i];
+			}
 		},
 		getCurPos: function(){
 			return this.currentPos;
@@ -126,6 +207,19 @@ world.fillView = function(x, y, objectView, width, height, mapView){
 	}
 	return true;
 }
+world.getShapesView = function(x, y, width, height, shapesMap){
+	if (x < 0 || (x + width) > WIDTH || y < 0 || (y + height) > HEIGHT){
+		return false;
+	}
+	var result = [];
+	for (var i = x; i < x + width; i++){
+		result[i-x] = [];
+		for (var j = y; j < y + height; j++) {
+			result[i-x][j-y] = shapesMap[i][j];
+		}
+	}
+	return result;
+}
 
 const HIDDEN_WIDGET = {
 	style: {
@@ -150,16 +244,16 @@ styles[WALL] = {
 		textColor: FRAME_COLOR
 	}
 };
-styles[VOID] = {
-	width: BLOCK_SIZE,
-	height: BLOCK_SIZE,
-	style: {
-		borderWidth: 0,
-		borderStyle: 'none',
-		backgroundColor: VOID_COLOR,
-		textColor: VOID_COLOR
-	}
-}
+// styles[VOID] = {
+// 	width: BLOCK_SIZE,
+// 	height: BLOCK_SIZE,
+// 	style: {
+// 		borderWidth: 0,
+// 		borderStyle: 'none',
+// 		backgroundColor: VOID_COLOR,
+// 		textColor: VOID_COLOR
+// 	}
+// }
 styles[BRICK] = {
 	width: BLOCK_SIZE,
 	height: BLOCK_SIZE,
@@ -207,12 +301,20 @@ function mapDeepCopy(sourceMap, destMap){
 
 var renderer = {
 	init: async function () {
-		if (world.shapes.length === 0){
-			var viewport = rtb.board.getViewport();
-			await this.createWidgets(viewport.x + viewport.width, viewport.y + viewport.height);
-			//await rtb.board.setViewportWithAnimation({x: viewport.x - BLOCK_SIZE, y: viewport.y - BLOCK_SIZE, width: (WIDTH + 1) * BLOCK_SIZE, height: (HEIGHT + 1) * BLOCK_SIZE})
-		} else {
-			mapDeepCopy(world.initialMap, world.dirtyMap);
+		// if (world.shapes.length === 0){
+		// 	var viewport = rtb.board.getViewport();
+		// 	await this.createWidgets(viewport.x + viewport.width, viewport.y + viewport.height);
+		// 	//await rtb.board.setViewportWithAnimation({x: viewport.x - BLOCK_SIZE, y: viewport.y - BLOCK_SIZE, width: (WIDTH + 1) * BLOCK_SIZE, height: (HEIGHT + 1) * BLOCK_SIZE})
+		// } else {
+		// 	mapDeepCopy(world.initialMap, world.dirtyMap);
+		// }
+		mapDeepCopy(world.initialMap, world.dirtyMap);
+		world.shapes = [];
+		for (var i = 0; i < WIDTH; i++){
+			world.shapes[i] = [];
+			for (var j = 0; j < HEIGHT; j++){
+				world.shapes[i][j] = VOID;
+			}
 		}
 		world.ball.init(5, 16);
 		world.pads[0].init(4, 1);
@@ -232,6 +334,9 @@ var renderer = {
 					continue;
 				}
 				var value = world.map[i][j];
+				if (styles[value] == null){
+					continue
+				}
 				var createdObj = Object.assign(
 					{}, styles[value], {
 						x: BLOCK_STEP * i,
@@ -271,34 +376,34 @@ var renderer = {
 		// 	await promeses[i];
 		// }
 	},
-	redrawMap: async function (force, maxWidth) {
-		var objects = [];
-		if (!maxWidth){
-			maxWidth = WIDTH;
-		}
+	redrawMap: async function (force) {
+		// var objects = [];
 		for (var i = 0; i < WIDTH; i++) {
 			for (var j = 0; j < HEIGHT; j++) {
 				if (world.dirtyMap[i][j] !== world.map[i][j] || force === true){
 					var value = world.dirtyMap[i][j];
 					//ToDo hack
-					if (value == INVISIBLE){
+					if (value === INVISIBLE){
 						continue;
 					}
 					world.map[i][j] = world.dirtyMap[i][j];
-					if (objects[value] == null) {
-						objects[value] = [];
-					}
-					objects[value].push(world.shapes[i][j]);
+					// if (world.map[i][j] === VOID) {
+					// 	continue;
+					// }
+					// if (objects[value] == null) {
+					// 	objects[value] = [];
+					// }
+					//objects[value].push(world.shapes[i][j]);
 				}
 			}
 		}
 		// batch update
 		//var promeses = [];
-		for (var i = 0; i < objects.length; i++) {
-			if (objects[i]) {
-				rtb.board.widgets.shapes.update(objects[i], styles[i]);
-			}
-		}
+		// for (var i = 0; i < objects.length; i++) {
+		// 	if (objects[i]) {
+		// 		rtb.board.widgets.shapes.update(objects[i], styles[i]);
+		// 	}
+		// }
 		// for (var i = 0; i < promeses.length; i++) {
 		// 	await promeses[i];
 		// }

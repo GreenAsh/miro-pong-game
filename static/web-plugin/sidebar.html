@@ -69,6 +69,7 @@
 		const JOIN = "join";
 		const MOVE_LEFT = "moveLeft";
 		const MOVE_RIGHT = "moveRight";
+		const BALL_LOOP_INTERVAL = 50;
 
 		let app = {
 			hosted: false,
@@ -139,7 +140,7 @@
 											}
 										}
 									}
-								}, 100);
+								}, BALL_LOOP_INTERVAL);
 							}
 							message = "Game is started";
 						}
