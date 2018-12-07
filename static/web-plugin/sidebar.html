@@ -32,6 +32,7 @@
 			text-overflow: ellipsis;
 		}
 	</style>
+	<script src="sound.js"></script>
 	<script src="global.js"></script>
 	<script src="mapData.js"></script>
 	<script src="engineAndMap.js"></script>
@@ -69,6 +70,8 @@
 		const JOIN = "join";
 		const MOVE_LEFT = "moveLeft";
 		const MOVE_RIGHT = "moveRight";
+
+		const BALL_LOOP = 80;
 
 		let app = {
 			hosted: false,
@@ -129,6 +132,19 @@
 											|| world.map[world.ball.getCurPos().x][world.ball.getCurPos().y + y] !== VOID) {
 											app.ballDirection.y = -y;
 										}
+										let xCollision = world.map[world.ball.getCurPos().x + x][world.ball.getCurPos().y];
+										let yCollision = world.map[world.ball.getCurPos().x][world.ball.getCurPos().y + y];
+
+										if (xCollision === WALL || yCollision === WALL){
+											sound.plop.play();
+										}
+										if (xCollision === PAD || yCollision === PAD){
+											sound.beep.play();
+										}
+										if (xCollision === INVISIBLE || yCollision === INVISIBLE){
+											sound.peep.play();
+										}
+
 										if (world.ball.move(app.ballDirection.x, app.ballDirection.y)) {
 											renderer.redrawMap();
 										} else {
@@ -139,7 +155,7 @@
 											}
 										}
 									}
-								}, 100);
+								}, BALL_LOOP);
 							}
 							message = "Game is started";
 						}

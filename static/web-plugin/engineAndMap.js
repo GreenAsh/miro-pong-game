@@ -209,7 +209,7 @@ var renderer = {
 	init: async function () {
 		if (world.shapes.length === 0){
 			var viewport = rtb.board.getViewport();
-			await this.createWidgets(viewport.x + viewport.width, viewport.y + viewport.height);
+			this.createWidgets(viewport.x + viewport.width, viewport.y + viewport.height);
 			//await rtb.board.setViewportWithAnimation({x: viewport.x - BLOCK_SIZE, y: viewport.y - BLOCK_SIZE, width: (WIDTH + 1) * BLOCK_SIZE, height: (HEIGHT + 1) * BLOCK_SIZE})
 		} else {
 			mapDeepCopy(world.initialMap, world.dirtyMap);
@@ -259,7 +259,6 @@ var renderer = {
 				// objects[value].push(shape.id);
 			}
 		}
-		//console.log(JSON.stringify(world.shapes));
 		// // batch update
 		// var promeses = [];
 		// for (var i = 0; i < objects.length; i++) {
@@ -271,11 +270,8 @@ var renderer = {
 		// 	await promeses[i];
 		// }
 	},
-	redrawMap: async function (force, maxWidth) {
+	redrawMap: async function (force) {
 		var objects = [];
-		if (!maxWidth){
-			maxWidth = WIDTH;
-		}
 		for (var i = 0; i < WIDTH; i++) {
 			for (var j = 0; j < HEIGHT; j++) {
 				if (world.dirtyMap[i][j] !== world.map[i][j] || force === true){
