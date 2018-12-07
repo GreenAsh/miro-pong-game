@@ -9,10 +9,10 @@ var world = {
 	dirtyMap: [],
 	shapes: SHAPES,
 	pads: [{
-		width: 5,
-		height: 1,
-		mapView: [[PAD], [PAD], [PAD], [PAD], [PAD]],
-		clearView: [[VOID], [VOID], [VOID], [VOID], [VOID]],
+		width: 7,
+		height: 2,
+		mapView: [[VOID, PAD], [PAD, PAD], [PAD, VOID], [PAD, VOID], [PAD, VOID], [ PAD, PAD ], [VOID, PAD]],
+		clearView: [[VOID, VOID], [VOID, VOID], [VOID, VOID], [VOID, VOID], [VOID, VOID], [VOID, VOID], [VOID, VOID]],
 		currentPos: {x: 0, y: 0},
 		canSetObjectView: function (){},
 		init: function (x, y) {
@@ -39,10 +39,10 @@ var world = {
 			this.currentPos.y = y;
 		}
 	}, {
-		width: 5,
-		height: 3,
-		mapView: [[VOID, VOID, PAD], [PAD, PAD, PAD], [VOID, VOID, PAD], [ VOID, VOID, PAD], [VOID, VOID, PAD]],
-		clearView: [[VOID, VOID, VOID], [VOID, VOID, VOID], [VOID, VOID, VOID], [VOID, VOID, VOID], [VOID, VOID, VOID]],
+		width: 7,
+		height: 2,
+		mapView: [[PAD, VOID], [PAD, PAD], [VOID, PAD], [VOID, PAD], [VOID, PAD], [ PAD, PAD ], [PAD, VOID]],
+		clearView: [[VOID, VOID], [VOID, VOID], [VOID, VOID], [VOID, VOID], [VOID, VOID], [VOID, VOID], [VOID, VOID]],
 		currentPos: {x: 0, y: 0},
 		canSetObjectView: function (){},
 		init: function (x, y) {
@@ -214,7 +214,7 @@ var renderer = {
 		} else {
 			mapDeepCopy(world.initialMap, world.dirtyMap);
 		}
-		world.ball.init(18, 14);
+		world.ball.init(parseInt((WIDTH - world.ball.width) / 2) + 1, parseInt((HEIGHT - world.ball.height) / 2) + 1);
 		world.pads[0].init(parseInt((WIDTH - world.pads[0].width) / 2), 1);
 		world.pads[1].init(parseInt((WIDTH - world.pads[1].width) / 2), HEIGHT - world.pads[1].height - 1);
 		await this.redrawMap(true);
