@@ -2,6 +2,9 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const cors = require('cors')
 const mustacheExpress = require('mustache-express')
+const https = require('https')
+const http = require('http')
+const fs = require('fs')
 
 const api = require('./api')
 const db = require('./db')
@@ -45,7 +48,144 @@ app.post('/events', (req, res) => {
 	}
 })
 
-app.listen(port, () => {
-	console.log(`App listening on port ${port}`)
-	db.init()
-})
+// app.listen(port, () => {
+// 	console.log(`App listening on port ${port}`)
+// 	db.init()
+// })
+const httpServer = http.createServer(app);
+httpServer.listen(port);
+
+// let privateKey  = fs.readFileSync('/Users/moskalenko/Documents/GitHub/rtbhackaton5/key.pem', 'utf8');
+// let certificate = fs.readFileSync('/Users/moskalenko/Documents/GitHub/rtbhackaton5/certificate.pem', 'utf8');
+// let credentials = {key: privateKey, cert: certificate};
+// const httpsServer = https.createServer(credentials);
+
+/***
+ * WEBSOCKET
+ */
+
+const WebSocket = require('ws');
+const wss = new WebSocket.Server({
+	server: httpServer
+});
+
+wss.broadcast = function broadcast(data) {
+	wss.clients.forEach(function each(client) {
+		if (client.readyState === WebSocket.OPEN) {
+			client.send(data);
+		}
+	});
+};
+
+const STOPPED = 0;
+const AWAITING = 1;
+const STARTED = 2;
+
+let game = {
+	state: STOPPED,
+	initiator: null,
+}
+
+wss.on('connection', function connection(ws) {
+	ws.on('message', function incoming(data) {
+		switch (data) {
+			case "prepare":
+				if (game.state === STOPPED){
+					game.state = AWAITING;
+					game.initiator = ws;
+					wss.clients.forEach(function each(client) {
+						if (client !== ws && client.readyState === WebSocket.OPEN) {
+							client.send(JSON.stringify({
+								state: game.state
+							}));
+						}
+					});
+					game.initiator.send(JSON.stringify({
+						state: game.state,
+						host: true
+					}));
+					game.initiator.on("close", function close() {
+						game.state = STOPPED;
+						wss.broadcast(JSON.stringify({
+							state: game.state
+						}));
+					})
+				} else {
+					ws.send(JSON.stringify({
+						state: game.state
+					}));
+				}
+				break;
+			case "start":
+				if (game.state === AWAITING && game.initiator === ws){
+					game.state = STARTED;
+					wss.broadcast(JSON.stringify({
+						state: game.state
+					}));
+				} else {
+					ws.send(JSON.stringify({
+						state: game.state,
+						errorMessage: "You aren't creator of this session"
+					}));
+				}
+				break;
+			case "stop":
+				if (game.state === STARTED && game.initiator === ws){
+					game.state = STOPPED;
+					game.initiator = null;
+					wss.broadcast(JSON.stringify({
+						state: game.state
+					}));
+				} else {
+					ws.send(JSON.stringify({
+						state: game.state,
+						errorMessage: "You aren't creator of this session"
+					}));
+				}
+				break;
+			case "state":
+				ws.send(JSON.stringify({
+					state: game.state
+				}));
+				break;
+			case "whoAmI":
+				ws.send(JSON.stringify({
+					state: game.state,
+					command: data,
+					host: ws === game.initiator
+				}))
+				break;
+			case "sync":
+				if (game.state === AWAITING && game.initiator === ws){
+					wss.clients.forEach(function each(client) {
+						if (client !== ws && client.readyState === WebSocket.OPEN) {
+							client.send(JSON.stringify({
+								state: game.state,
+								command: ""
+							}));
+						}
+					});
+				}
+				break;
+			case "join":
+				if (game.state === AWAITING && game.initiator !== ws){
+					ws.send(JSON.stringify({
+						state: game.state,
+						command: "joined"
+					}))
+				}
+				break;
+			default:
+				if (game.state === STARTED && game.initiator != null){
+					game.initiator.send(JSON.stringify({
+						state: game.state,
+						command: data
+					}));
+				}
+				break;
+		}
+		ws.send(JSON.stringify({
+			state: game.state
+		}));
+	});
+});
