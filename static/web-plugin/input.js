@@ -13,6 +13,16 @@ var input = {
 						await renderer.redrawMap();
 					}
 					break;
+				case 38: // up
+					if (world.pads[3].move(0, -1)) {
+						await renderer.redrawMap();
+					}
+					break;
+				case 40: // down
+					if (world.pads[3].move(0, 1)) {
+						await renderer.redrawMap();
+					}
+					break;
 				case 90: // left
 					if (world.pads[0].move(-1, 0)) {
 						await renderer.redrawMap();
@@ -23,7 +33,18 @@ var input = {
 						await renderer.redrawMap();
 					}
 					break;
+				case 81: // up
+					if (world.pads[2].move(0, -1)) {
+						await renderer.redrawMap();
+					}
+					break;
+				case 65: // down
+					if (world.pads[2].move(0, 1)) {
+						await renderer.redrawMap();
+					}
+					break;
 				default:
+					console.log(e.which);
 					return; // exit this handler for other keys
 			}
 			e.preventDefault(); // prevent the default action (scroll / move caret)

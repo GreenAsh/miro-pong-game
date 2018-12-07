@@ -224,7 +224,7 @@
 				}
 			},
 			clean: function(){
-				if (app.lastMessage.state === STOPPED && app.started === false){
+				if ((app.lastMessage == null || app.lastMessage.state === STOPPED) && app.started === false){
 					renderer.init();
 				}
 			}

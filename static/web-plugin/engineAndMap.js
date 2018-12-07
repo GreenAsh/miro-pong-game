@@ -7,6 +7,7 @@ var world = {
 	initialMap: [],
 	map: [],
 	dirtyMap: [],
+	redrawArea: [],
 	shapes: SHAPES,
 	pads: [{
 		width: 5,
@@ -24,6 +25,12 @@ var world = {
 		},
 		move: function(deltaX, deltaY){
 			if (this.canSetObjectView(this.getCurPos().x + deltaX, this.getCurPos().y + deltaY, this.mapView, this.width, this.height, world.map)) {
+				world.redrawArea.push({
+					x: Math.min(this.getCurPos().x, this.getCurPos().x + deltaX),
+					y: Math.min(this.getCurPos().y, this.getCurPos().y + deltaY),
+					xTop: Math.max(this.getCurPos().x + deltaX + this.width, this.getCurPos().x + this.width),
+					yTop: Math.max(this.getCurPos().y + deltaY + this.height, this.getCurPos().y + this.height),
+				});
 				world.fillView(this.getCurPos().x, this.getCurPos().y, this.clearView, this.width, this.height, world.dirtyMap);
 				this.setCurPos(this.getCurPos().x + deltaX, this.getCurPos().y + deltaY);
 				world.fillView(this.getCurPos().x, this.getCurPos().y, this.mapView, this.width, this.height, world.dirtyMap);
@@ -54,6 +61,85 @@ var world = {
 		},
 		move: function(deltaX, deltaY){
 			if (this.canSetObjectView(this.getCurPos().x + deltaX, this.getCurPos().y + deltaY, this.mapView, this.width, this.height, world.map)) {
+				world.redrawArea.push({
+					x: Math.min(this.getCurPos().x, this.getCurPos().x + deltaX),
+					y: Math.min(this.getCurPos().y, this.getCurPos().y + deltaY),
+					xTop: Math.max(this.getCurPos().x + deltaX + this.width, this.getCurPos().x + this.width),
+					yTop: Math.max(this.getCurPos().y + deltaY + this.height, this.getCurPos().y + this.height),
+				});
+				world.fillView(this.getCurPos().x, this.getCurPos().y, this.clearView, this.width, this.height, world.dirtyMap);
+				this.setCurPos(this.getCurPos().x + deltaX, this.getCurPos().y + deltaY);
+				world.fillView(this.getCurPos().x, this.getCurPos().y, this.mapView, this.width, this.height, world.dirtyMap);
+				return true;
+			}
+			return false;
+		},
+		getCurPos: function(){
+			return this.currentPos;
+		},
+		setCurPos: function(x, y){
+			this.currentPos.x = x;
+			this.currentPos.y = y;
+		}
+	}, {
+		width: 1,
+		height: 5,
+		mapView: [[PAD, PAD, PAD, PAD, PAD]],
+		clearView: [[VOID, VOID, VOID, VOID, VOID]],
+		currentPos: {x: 0, y: 0},
+		canSetObjectView: function (){},
+		init: function (x, y) {
+			this.canSetObjectView = world.canSetObjectView;
+			if (this.canSetObjectView(x, y, this.mapView, this.width, this.height, world.map)){
+				this.setCurPos(x, y);
+				world.fillView(this.getCurPos().x, this.getCurPos().y, this.mapView, this.width, this.height, world.dirtyMap);
+			}
+		},
+		move: function(deltaX, deltaY){
+			if (this.canSetObjectView(this.getCurPos().x + deltaX, this.getCurPos().y + deltaY, this.mapView, this.width, this.height, world.map)) {
+				world.redrawArea.push({
+					x: Math.min(this.getCurPos().x, this.getCurPos().x + deltaX),
+					y: Math.min(this.getCurPos().y, this.getCurPos().y + deltaY),
+					xTop: Math.max(this.getCurPos().x + deltaX + this.width, this.getCurPos().x + this.width),
+					yTop: Math.max(this.getCurPos().y + deltaY + this.height, this.getCurPos().y + this.height),
+				});
+				world.fillView(this.getCurPos().x, this.getCurPos().y, this.clearView, this.width, this.height, world.dirtyMap);
+				this.setCurPos(this.getCurPos().x + deltaX, this.getCurPos().y + deltaY);
+				world.fillView(this.getCurPos().x, this.getCurPos().y, this.mapView, this.width, this.height, world.dirtyMap);
+				return true;
+			}
+			return false;
+		},
+		getCurPos: function(){
+			return this.currentPos;
+		},
+		setCurPos: function(x, y){
+			this.currentPos.x = x;
+			this.currentPos.y = y;
+		}
+	},
+	{
+		width: 1,
+		height: 5,
+		mapView: [[PAD, PAD, PAD, PAD, PAD]],
+		clearView: [[VOID, VOID, VOID, VOID, VOID]],
+		currentPos: {x: 0, y: 0},
+		canSetObjectView: function (){},
+		init: function (x, y) {
+			this.canSetObjectView = world.canSetObjectView;
+			if (this.canSetObjectView(x, y, this.mapView, this.width, this.height, world.map)){
+				this.setCurPos(x, y);
+				world.fillView(this.getCurPos().x, this.getCurPos().y, this.mapView, this.width, this.height, world.dirtyMap);
+			}
+		},
+		move: function(deltaX, deltaY){
+			if (this.canSetObjectView(this.getCurPos().x + deltaX, this.getCurPos().y + deltaY, this.mapView, this.width, this.height, world.map)) {
+				world.redrawArea.push({
+					x: Math.min(this.getCurPos().x, this.getCurPos().x + deltaX),
+					y: Math.min(this.getCurPos().y, this.getCurPos().y + deltaY),
+					xTop: Math.max(this.getCurPos().x + deltaX + this.width, this.getCurPos().x + this.width),
+					yTop: Math.max(this.getCurPos().y + deltaY + this.height, this.getCurPos().y + this.height),
+				});
 				world.fillView(this.getCurPos().x, this.getCurPos().y, this.clearView, this.width, this.height, world.dirtyMap);
 				this.setCurPos(this.getCurPos().x + deltaX, this.getCurPos().y + deltaY);
 				world.fillView(this.getCurPos().x, this.getCurPos().y, this.mapView, this.width, this.height, world.dirtyMap);
@@ -85,6 +171,12 @@ var world = {
 		},
 		move: function(deltaX, deltaY){
 			if (this.canSetObjectView(this.getCurPos().x + deltaX, this.getCurPos().y + deltaY, this.mapView, this.width, this.height, world.map)) {
+				world.redrawArea.push({
+					x: Math.min(this.getCurPos().x, this.getCurPos().x + deltaX),
+					y: Math.min(this.getCurPos().y, this.getCurPos().y + deltaY),
+					xTop: Math.max(this.getCurPos().x + deltaX + this.width, this.getCurPos().x + this.width),
+					yTop: Math.max(this.getCurPos().y + deltaY + this.height, this.getCurPos().y + this.height),
+				});
 				world.fillView(this.getCurPos().x, this.getCurPos().y, this.clearView, this.width, this.height, world.dirtyMap);
 				this.setCurPos(this.getCurPos().x + deltaX, this.getCurPos().y + deltaY);
 				world.fillView(this.getCurPos().x, this.getCurPos().y, this.mapView, this.width, this.height, world.dirtyMap);
@@ -214,9 +306,11 @@ var renderer = {
 		} else {
 			mapDeepCopy(world.initialMap, world.dirtyMap);
 		}
-		world.ball.init(18, 14);
-		world.pads[0].init(parseInt((WIDTH - world.pads[0].width) / 2), 1);
-		world.pads[1].init(parseInt((WIDTH - world.pads[1].width) / 2), HEIGHT - world.pads[1].height - 1);
+		world.ball.init(parseInt((WIDTH - world.pads[0].width) / 2) + 1, parseInt((HEIGHT - world.pads[3].height) / 2) + 1);
+		world.pads[0].init(parseInt((WIDTH - world.pads[0].width) / 2), 1); // top
+		world.pads[1].init(parseInt((WIDTH - world.pads[1].width) / 2), HEIGHT - world.pads[1].height - 1); // bottom
+		world.pads[2].init(0, parseInt((HEIGHT - world.pads[2].height) / 2)); // left
+		world.pads[3].init(WIDTH - world.pads[3].width, parseInt((HEIGHT - world.pads[3].height) / 2)); // right
 		await this.redrawMap(true);
 	},
 	createWidgets: async function(viewX, viewY){
@@ -272,9 +366,9 @@ var renderer = {
 	},
 	redrawMap: async function (force) {
 		var objects = [];
-		for (var i = 0; i < WIDTH; i++) {
-			for (var j = 0; j < HEIGHT; j++) {
-				if (world.dirtyMap[i][j] !== world.map[i][j] || force === true){
+		if (force === true){
+			for (var i = 0; i < WIDTH; i++) {
+				for (var j = 0; j < HEIGHT; j++) {
 					var value = world.dirtyMap[i][j];
 					//ToDo hack
 					if (value == INVISIBLE){
@@ -285,6 +379,30 @@ var renderer = {
 						objects[value] = [];
 					}
 					objects[value].push(world.shapes[i][j]);
+				}
+			}
+		} else {
+			//ToDo hack partial redraw
+			var areas = world.redrawArea;
+			world.redrawArea = [];
+			for (var i = 0; i < areas.length; i++){
+				let area = areas[i];
+				let minX = Math.max(area.x, 0);
+				let maxX = Math.min(area.xTop + 1, WIDTH - 1);
+				let minY = Math.max(area.y, 0);
+				let maxY = Math.min(area.yTop + 1, HEIGHT - 1)
+				for (var x = minX; x < maxX; x++){
+					for (var y = minY; y < maxY; y++){
+						var value = world.dirtyMap[x][y];
+						if (value === INVISIBLE){
+							continue;
+						}
+						world.map[x][y] = world.dirtyMap[x][y];
+						if (objects[value] == null) {
+							objects[value] = [];
+						}
+						objects[value].push(world.shapes[x][y]);
+					}
 				}
 			}
 		}
