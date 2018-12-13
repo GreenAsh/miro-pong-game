@@ -76,6 +76,7 @@
 		const BALL_LOOP = 80;
 
 		let app = {
+			scores: [],
 			hosted: false,
 			joined: false,
 			lastCommand: null,
@@ -148,6 +149,23 @@
 										}
 										if (xCollision === INVISIBLE || yCollision === INVISIBLE || xyCollision === INVISIBLE){
 											sound.peep.play();
+											// 1, 18 // 12
+											let scoreX = 0;
+											let score = 0;
+											let scoreFill;
+											if (world.ball.getCurPos().y < 5 ){
+												score = ++app.bottomScore;
+												scoreX = 18;
+												scoreFill = PAD;
+											} else {
+												score = ++app.topScore;
+												scoreX = 1;
+												scoreFill = BALL;
+											}
+											score = 12 + Math.min(score, 5);
+											for (var scoreY = 12; scoreY < score; scoreY++){
+												world.dirtyMap[scoreX][scoreY] = scoreFill;
+											}
 										}
 
 										if (world.ball.move(app.ballDirection.x, app.ballDirection.y)) {
@@ -224,7 +242,7 @@
 				}
 			},
 			clean: function(){
-				if ((app.lastMessage == null || app.lastMessage.state === STOPPED) && app.started === false){
+				if (app.lastMessage.state === STOPPED && app.started === false){
 					renderer.init();
 				}
 			}

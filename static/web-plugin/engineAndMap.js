@@ -14,6 +14,7 @@ var world = {
 		height: 1,
 		mapView: [[PAD], [PAD], [PAD], [PAD], [PAD]],
 		clearView: [[VOID], [VOID], [VOID], [VOID], [VOID]],
+		//scoreArea: { x: 0, y: }
 		currentPos: {x: 0, y: 0},
 		canSetObjectView: function (){},
 		init: function (x, y) {
@@ -200,7 +201,10 @@ world.canSetObjectView = function(x, y, objectView, width, height, mapView){
 	}
 	for (var i = x; i < x + width; i++){
 		for (var j = y; j < y + height; j++){
-			if (mapView[i][j] !== VOID && objectView[i - x][j - y] !== VOID && mapView[i][j] !== objectView[i - x][j - y]){
+			if (mapView[i][j] !== VOID &&
+				objectView[i - x][j - y] !== VOID &&
+				mapView[i][j] !== objectView[i - x][j - y]
+			){
 				return false;
 			}
 		}
