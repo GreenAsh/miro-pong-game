@@ -5,22 +5,22 @@ var input = {
 			switch (e.which) {
 				case 37: // left
 					if (world.pads[1].move(-1, 0)) {
-						await renderer.redrawMap();
+						renderer.redrawMap();
 					}
 					break;
 				case 39: // right
 					if (world.pads[1].move(1, 0)) {
-						await renderer.redrawMap();
+						renderer.redrawMap();
 					}
 					break;
 				case 90: // left
 					if (world.pads[0].move(-1, 0)) {
-						await renderer.redrawMap();
+						renderer.redrawMap();
 					}
 					break;
 				case 88: // right
 					if (world.pads[0].move(1, 0)) {
-						await renderer.redrawMap();
+						renderer.redrawMap();
 					}
 					break;
 				default:

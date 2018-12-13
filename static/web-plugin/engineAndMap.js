@@ -77,7 +77,13 @@ var world = {
 		currentPos: {x:0,y:0},
 		canSetObjectView: function(){},
 		init: function(x, y){
-			this.canSetObjectView = world.canSetObjectView;
+			this.canSetObjectView = function(x, y, objectView, width, height, mapView){
+				let result = world.canSetObjectView(x, y, objectView, width, height, mapView);
+				if (result){
+
+				}
+				return result;
+			}
 			if (this.canSetObjectView(x, y, this.mapView, this.width, this.height, world.map)){
 				this.setCurPos(x, y);
 				world.fillView(this.getCurPos().x, this.getCurPos().y, this.mapView, this.width, this.height, world.dirtyMap);
@@ -108,7 +114,10 @@ world.canSetObjectView = function(x, y, objectView, width, height, mapView){
 	}
 	for (var i = x; i < x + width; i++){
 		for (var j = y; j < y + height; j++){
-			if (mapView[i][j] !== VOID && objectView[i - x][j - y] !== VOID && mapView[i][j] !== objectView[i - x][j - y]){
+			if (mapView[i][j] !== VOID &&
+				objectView[i - x][j - y] !== VOID &&
+				mapView[i][j] !== objectView[i - x][j - y]
+			){
 				return false;
 			}
 		}
@@ -210,6 +219,7 @@ var renderer = {
 		if (world.shapes.length === 0){
 			var viewport = rtb.board.getViewport();
 			this.createWidgets(viewport.x + viewport.width, viewport.y + viewport.height);
+			rtb.board.setViewportWithAnimation()
 			//await rtb.board.setViewportWithAnimation({x: viewport.x - BLOCK_SIZE, y: viewport.y - BLOCK_SIZE, width: (WIDTH + 1) * BLOCK_SIZE, height: (HEIGHT + 1) * BLOCK_SIZE})
 		} else {
 			mapDeepCopy(world.initialMap, world.dirtyMap);
