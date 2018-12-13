@@ -24,9 +24,12 @@ var world = {
 		},
 		move: function(deltaX, deltaY){
 			if (this.canSetObjectView(this.getCurPos().x + deltaX, this.getCurPos().y + deltaY, this.mapView, this.width, this.height, world.map)) {
-				world.fillView(this.getCurPos().x, this.getCurPos().y, this.clearView, this.width, this.height, world.dirtyMap);
+				let clearView = world.getView(this.getCurPos().x, this.getCurPos().y, this.width, this.height, world.initialMap);
+				world.fillView(this.getCurPos().x, this.getCurPos().y, clearView, this.width, this.height, world.dirtyMap);
 				this.setCurPos(this.getCurPos().x + deltaX, this.getCurPos().y + deltaY);
-				world.fillView(this.getCurPos().x, this.getCurPos().y, this.mapView, this.width, this.height, world.dirtyMap);
+				let backView = world.getView(this.getCurPos().x, this.getCurPos().y, this.width, this.height, world.initialMap);
+				let objView = world.mergeView(this.mapView, backView, VOID);
+				world.fillView(this.getCurPos().x, this.getCurPos().y, objView, this.width, this.height, world.dirtyMap);
 				return true;
 			}
 			return false;
@@ -54,9 +57,11 @@ var world = {
 		},
 		move: function(deltaX, deltaY){
 			if (this.canSetObjectView(this.getCurPos().x + deltaX, this.getCurPos().y + deltaY, this.mapView, this.width, this.height, world.map)) {
-				world.fillView(this.getCurPos().x, this.getCurPos().y, this.clearView, this.width, this.height, world.dirtyMap);
+				let clearView = world.getView(this.getCurPos().x, this.getCurPos().y, this.width, this.height, world.initialMap);
+				world.fillView(this.getCurPos().x, this.getCurPos().y, clearView, this.width, this.height, world.dirtyMap);
 				this.setCurPos(this.getCurPos().x + deltaX, this.getCurPos().y + deltaY);
-				world.fillView(this.getCurPos().x, this.getCurPos().y, this.mapView, this.width, this.height, world.dirtyMap);
+				let objView = world.mergeView(this.mapView, clearView, VOID);
+				world.fillView(this.getCurPos().x, this.getCurPos().y, objView, this.width, this.height, world.dirtyMap);
 				return true;
 			}
 			return false;
@@ -78,11 +83,23 @@ var world = {
 		canSetObjectView: function(){},
 		init: function(x, y){
 			this.canSetObjectView = function(x, y, objectView, width, height, mapView){
-				let result = world.canSetObjectView(x, y, objectView, width, height, mapView);
-				if (result){
-
+				//let result = world.canSetObjectView(x, y, objectView, width, height, mapView);
+				//if (result) {
+				if (x < 0 || (x + width) > WIDTH || y < 0 || (y + height) > HEIGHT){
+					return false;
 				}
-				return result;
+				for (var i = x; i < x + width; i++){
+					for (var j = y; j < y + height; j++){
+						if (mapView[i][j] !== VOID &&
+							mapView[i][j] !== INVISIBLE &&
+							objectView[i - x][j - y] !== VOID &&
+							mapView[i][j] !== objectView[i - x][j - y]
+						) {
+							return false;
+						}
+					}
+				}
+				return true;
 			}
 			if (this.canSetObjectView(x, y, this.mapView, this.width, this.height, world.map)){
 				this.setCurPos(x, y);
@@ -91,7 +108,8 @@ var world = {
 		},
 		move: function(deltaX, deltaY){
 			if (this.canSetObjectView(this.getCurPos().x + deltaX, this.getCurPos().y + deltaY, this.mapView, this.width, this.height, world.map)) {
-				world.fillView(this.getCurPos().x, this.getCurPos().y, this.clearView, this.width, this.height, world.dirtyMap);
+				let clearView = world.getView(this.getCurPos().x, this.getCurPos().y, this.width, this.height, world.initialMap);
+				world.fillView(this.getCurPos().x, this.getCurPos().y, clearView, this.width, this.height, world.dirtyMap);
 				this.setCurPos(this.getCurPos().x + deltaX, this.getCurPos().y + deltaY);
 				world.fillView(this.getCurPos().x, this.getCurPos().y, this.mapView, this.width, this.height, world.dirtyMap);
 				return true;
@@ -134,6 +152,31 @@ world.fillView = function(x, y, objectView, width, height, mapView){
 		}
 	}
 	return true;
+}
+world.mergeView = function(topView, backgroundView, mask){
+	let result = [];
+	for (let i = 0; i < topView.length; i++){
+		let row = topView[i];
+		result[i] = [];
+		for (let j = 0; j < row.length; j++) {
+			result[i][j] = topView[i][j] === mask ? backgroundView[i][j] : topView[i][j];
+		}
+	}
+	return result;
+}
+
+world.getView = function(x, y, width, height, mapView){
+	if (x < 0 || (x + width) > WIDTH || y < 0 || (y + height) > HEIGHT){
+		return [[]];
+	}
+	let result = [];
+	for (let i = x; i < x + width; i++){
+		result[i-x] = [];
+		for (let j = y; j < y + height; j++) {
+			result[i-x][j-y] = mapView[i][j];
+		}
+	}
+	return result;
 }
 
 const HIDDEN_WIDGET = {
@@ -219,7 +262,7 @@ var renderer = {
 		if (world.shapes.length === 0){
 			var viewport = rtb.board.getViewport();
 			this.createWidgets(viewport.x + viewport.width, viewport.y + viewport.height);
-			rtb.board.setViewportWithAnimation()
+			//rtb.board.setViewportWithAnimation()
 			//await rtb.board.setViewportWithAnimation({x: viewport.x - BLOCK_SIZE, y: viewport.y - BLOCK_SIZE, width: (WIDTH + 1) * BLOCK_SIZE, height: (HEIGHT + 1) * BLOCK_SIZE})
 		} else {
 			mapDeepCopy(world.initialMap, world.dirtyMap);
@@ -287,7 +330,10 @@ var renderer = {
 				if (world.dirtyMap[i][j] !== world.map[i][j] || force === true){
 					var value = world.dirtyMap[i][j];
 					//ToDo hack
-					if (value == INVISIBLE){
+					if (value === INVISIBLE){
+						continue;
+					}
+					if (world.shapes[i][j] === INVISIBLE){
 						continue;
 					}
 					world.map[i][j] = world.dirtyMap[i][j];

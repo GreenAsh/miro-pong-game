@@ -73,7 +73,8 @@
 		const MOVE_LEFT = "moveLeft";
 		const MOVE_RIGHT = "moveRight";
 
-		const BALL_LOOP = 80;
+		const BALL_LOOP = 100 ;
+		const REDRAW_LOOP = 50;
 
 		let app = {
 			topScore: 0,
@@ -83,11 +84,13 @@
 			lastCommand: null,
 			lastMessage: null,
 			ballLoop: null,
+			readrawLoop: null,
 			ballDirection: null,
 			socket: null,
 			started: false,
+			ballTicker: 0,
 			init: function(){
-				this.socket = new WebSocket("wss://a71c4895.ngrok.io", "protocolOne");
+				this.socket = new WebSocket("wss://5f804b81.ngrok.io", "protocolOne");
 				this.socket.onmessage = app.onmessage;
 			},
 			onmessage: function(event){
@@ -96,93 +99,15 @@
 				let message = "Unknown status";
 				switch (app.lastMessage.state) {
 					case STOPPED:
-						app.started = false;
+						app.stopGame();
 						message = "Game is Stopped, please create session";
-						if (app.ballLoop){
-							clearInterval(app.ballLoop);
-							document.onkeydown = function(){};
-						}
 						break;
 					case AWAITING:
 						message = "Game is in awaiting status";
 						break;
 					case STARTED:
-						if (app.started === false) {
-							app.started = true;
-							if (app.joined) {
-								//ToDo alalala
-								// mapDeepCopy(world.initialMap, world.dirtyMap);
-								// world.ball.init(5, 16);
-								// world.pads[0].init(4, 1);
-								// world.pads[1].init(4, 17);
-								input.asClient(app);
-							}
-							if (app.hosted === true) {
-								input.asHost();
-								app.ballDirection = {x: -1, y: -1};
-								app.ballLoop = setInterval(() => {
-									if (world.ball.move(app.ballDirection.x, app.ballDirection.y)) {
-										renderer.redrawMap();
-									} else {
-										const x = app.ballDirection.x
-										const width = world.ball.width
-										if (world.ball.getCurPos().x + x < 0 || (world.ball.getCurPos().x + x + width) > WIDTH || world.map[world.ball.getCurPos().x
-										+ x][world.ball.getCurPos().y] !== VOID) {
-											app.ballDirection.x = -x;
-										}
-										const y = app.ballDirection.y
-										const height = world.ball.height
-										if (world.ball.getCurPos().y + y < 0 || (world.ball.getCurPos().y + y + height) > HEIGHT
-											|| world.map[world.ball.getCurPos().x][world.ball.getCurPos().y + y] !== VOID) {
-											app.ballDirection.y = -y;
-										}
-										let xCollision = world.map[world.ball.getCurPos().x + x][world.ball.getCurPos().y];
-										let yCollision = world.map[world.ball.getCurPos().x][world.ball.getCurPos().y + y];
-										let xyCollision = world.map[world.ball.getCurPos().x + x][world.ball.getCurPos().y + y];
-
-										if (xCollision === WALL || yCollision === WALL
-											|| xCollision === BRICK || yCollision === BRICK
-											|| xyCollision === WALL || xyCollision === BRICK ){
-											sound.plop.play();
-										}
-										if (xCollision === PAD || yCollision === PAD || xyCollision === PAD){
-											sound.beep.play();
-										}
-										if (xCollision === INVISIBLE || yCollision === INVISIBLE || xyCollision === INVISIBLE){
-											sound.peep.play();
-											// 1, 18 // 12
-											let scoreX = 0;
-											let score = 0;
-											let scoreFill;
-											if (world.ball.getCurPos().y < 5 ){
-												score = ++app.bottomScore;
-												scoreX = 18;
-												scoreFill = PAD;
-											} else {
-												score = ++app.topScore;
-												scoreX = 1;
-												scoreFill = BALL;
-											}
-											score = 12 + Math.min(score, 5);
-											for (var scoreY = 12; scoreY < score; scoreY++){
-												world.dirtyMap[scoreX][scoreY] = scoreFill;
-											}
-										}
-
-										if (world.ball.move(app.ballDirection.x, app.ballDirection.y)) {
-											renderer.redrawMap();
-										} else {
-											app.ballDirection.x = -x;
-											app.ballDirection.y = -y;
-											if (world.ball.move(app.ballDirection.x, app.ballDirection.y)) {
-												renderer.redrawMap();
-											}
-										}
-									}
-								}, BALL_LOOP);
-							}
-							message = "Game is started";
-						}
+						app.startGame();
+						message = "Game is started";
 						break;
 				}
 				if (app.lastMessage.host === true){
@@ -243,8 +168,131 @@
 				}
 			},
 			clean: function(){
-				if (app.lastMessage.state === STOPPED && app.started === false){
+				if ((app.lastMessage == null || app.lastMessage.state === STOPPED) && app.started === false){
+					this.topScore = 0;
+					this.bottomScore = 0;
+					this.ballTicker = 0;
 					renderer.init();
+					this.stopGame();
+				}
+			},
+			stopGame: function(){
+				if (app.ballLoop){
+					clearInterval(app.ballLoop);
+					document.onkeydown = function(){};
+				}
+				if (app.readrawLoop){
+					clearInterval(app.readrawLoop);
+					document.onkeydown = function(){};
+				}
+				app.started = false;
+			},
+			startGame: function(){
+				if (app.started === false) {
+					app.started = true;
+					if (app.joined) {
+						//ToDo alalala
+						// mapDeepCopy(world.initialMap, world.dirtyMap);
+						// world.ball.init(5, 16);
+						// world.pads[0].init(4, 1);
+						// world.pads[1].init(4, 17);
+						input.asClient(app);
+					}
+					if (app.hosted === true) {
+						input.asHost();
+						app.ballDirection = {x: Math.floor(Math.random() * 2) * 2 - 1, y: Math.floor(Math.random() * 2) * 2 - 1};
+						app.redrawLoop = setInterval(() => {
+							renderer.redrawMap();
+						}, REDRAW_LOOP);
+
+						app.ballLoop = setInterval(() => {
+							if (app.ballTicker > 0){
+								app.ballTicker++;
+								if (app.ballTicker % 4 === 0) {
+									let nextFill = VOID;
+									switch (world.map[world.ball.getCurPos().x][world.ball.getCurPos().y]) {
+										case BALL:
+											nextFill = VOID;
+											break;
+										default:
+											nextFill = BALL;
+											break;
+									}
+									world.dirtyMap[world.ball.getCurPos().x][world.ball.getCurPos().y] = nextFill;
+								}
+								if (app.ballTicker > 11){
+									world.dirtyMap[world.ball.getCurPos().x][world.ball.getCurPos().y] = BALL;
+									app.ballTicker = 0;
+								}
+								//ToDo this return
+								return;
+							}
+							if (world.ball.move(app.ballDirection.x, app.ballDirection.y) === false) {
+								const x = app.ballDirection.x;
+								const y = app.ballDirection.y;
+								//ToDo
+								// 1, 18 // 12
+								if (world.ball.getCurPos().y + y < 1) {
+									let scoreX = 18;
+									let score = ++app.bottomScore;
+									let scoreFill = PAD;
+									score = 16 - Math.min(score, 5);
+									for (let scoreY = 16; scoreY > score; scoreY--){
+										world.dirtyMap[scoreX][scoreY] = scoreFill;
+									}
+									world.ball.move(parseInt((WIDTH - world.ball.width) / 2) + 1 - world.ball.getCurPos().x, 8 - world.ball.getCurPos().y);
+									app.ballDirection.x = Math.floor(Math.random() * 2) * 2 - 1;
+									app.ballDirection.y = 1;
+									app.ballTicker = 1;
+									return;
+								} else if (world.ball.getCurPos().y + y >= HEIGHT) {
+									let scoreX = 1;
+									let score =  ++app.topScore;
+									let scoreFill = BALL;
+									score = 12 + Math.min(score, 5);
+									for (let scoreY = 12; scoreY < score; scoreY++){
+										world.dirtyMap[scoreX][scoreY] = scoreFill;
+									}
+									world.ball.move(parseInt((WIDTH - world.ball.width) / 2) + 1 - world.ball.getCurPos().x, HEIGHT - 8 - world.ball.getCurPos().y);
+									app.ballDirection.x = Math.floor(Math.random() * 2) * 2 - 1;
+									app.ballDirection.y = -1;
+									app.ballTicker = 1;
+									return;
+								}
+								//ToDo return in previous if
+								const width = world.ball.width
+								if (world.ball.getCurPos().x + x < 0 || (world.ball.getCurPos().x + x + width) > WIDTH || world.map[world.ball.getCurPos().x
+								+ x][world.ball.getCurPos().y] !== VOID) {
+									app.ballDirection.x = -x;
+								}
+								const height = world.ball.height
+								if (world.ball.getCurPos().y + y < 0 || (world.ball.getCurPos().y + y + height) > HEIGHT
+									|| world.map[world.ball.getCurPos().x][world.ball.getCurPos().y + y] !== VOID) {
+									app.ballDirection.y = -y;
+								}
+								let xCollision = world.map[world.ball.getCurPos().x + x][world.ball.getCurPos().y];
+								let yCollision = world.map[world.ball.getCurPos().x][world.ball.getCurPos().y + y];
+								let xyCollision = world.map[world.ball.getCurPos().x + x][world.ball.getCurPos().y + y];
+
+								if (xCollision === WALL || yCollision === WALL
+									|| xCollision === BRICK || yCollision === BRICK
+									|| xyCollision === WALL || xyCollision === BRICK ){
+									sound.plop.play();
+								}
+								if (xCollision === PAD || yCollision === PAD || xyCollision === PAD){
+									sound.beep.play();
+								}
+								if (xCollision === INVISIBLE || yCollision === INVISIBLE || xyCollision === INVISIBLE){
+									sound.peep.play();
+								}
+								if (world.ball.move(app.ballDirection.x, app.ballDirection.y) === false) {
+									app.ballDirection.x = -x;
+									app.ballDirection.y = -y;
+									world.ball.move(app.ballDirection.x, app.ballDirection.y);
+								}
+							}
+						}, BALL_LOOP);
+					}
 				}
 			}
 		};
