@@ -1,6 +1,30 @@
+const MOVEMENT_RATE = 20;
+
+let inputDisablingTimer = null;
+let inputDisabled = false;
+function startInputCheckTimer() {
+	if (inputDisablingTimer == null) {
+		inputDisablingTimer = setTimeout(function () {
+			inputDisabled = false;
+			clearTimeout(inputDisablingTimer);
+			inputDisablingTimer = null;
+		}, 1000 / MOVEMENT_RATE);
+	}
+}
+
 const input = {
 	asHost: function () {
+		document.onkeyup = async function (e) {
+			inputDisabled = false;
+			e.preventDefault();
+		};
 		document.onkeydown = async function (e) {
+			e.preventDefault(); // prevent the default action (scroll / move caret)
+			if (inputDisabled === true) {
+				startInputCheckTimer();
+				return;
+			}
+			inputDisabled = true;
 			e = e || window.event;
 			switch (e.which) {
 				case 37: // left
@@ -26,11 +50,20 @@ const input = {
 				default:
 					return; // exit this handler for other keys
 			}
-			e.preventDefault(); // prevent the default action (scroll / move caret)
 		}
 	},
 	asClient: function (app) {
+		document.onkeyup = async function (e) {
+			inputDisabled = false;
+			e.preventDefault();
+		};
 		document.onkeydown = async function (e) {
+			e.preventDefault(); // prevent the default action (scroll / move caret)
+			if (inputDisabled === true) {
+				startInputCheckTimer();
+				return;
+			}
+			inputDisabled = true;
 			e = e || window.event;
 			switch (e.which) {
 				case 37: // left
@@ -42,7 +75,6 @@ const input = {
 				default:
 					return; // exit this handler for other keys
 			}
-			e.preventDefault(); // prevent the default action (scroll / move caret)
 		}
 	}
 }
