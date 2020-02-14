@@ -340,8 +340,8 @@
 	app.init();
 
     async function prepareUI(started) {
-        const tlWidget = await miro.board.widgets.get({ id: world.shapes[0][0]})
-        const brWidget = await miro.board.widgets.get({ id: world.shapes[WIDTH - 1][HEIGHT - 1]})
+        const tlWidget = (await miro.board.widgets.get({ id: world.shapes[0][0]}))[0]
+        const brWidget = (await miro.board.widgets.get({ id: world.shapes[WIDTH - 1][HEIGHT - 1]}))[0]
         const viewport = {
             x: tlWidget.bounds.left,
             y: tlWidget.bounds.top,
