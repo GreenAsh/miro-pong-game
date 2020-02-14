@@ -1,8 +1,8 @@
-const BLOCK_COLOR = '#000000'
-const PAD_COLOR = '#A32F2F'
-const BALL_COLOR = '#05668D'
-const FRAME_COLOR = '#219B00'
-const VOID_COLOR = '#ffffff'
+const BLOCK_COLOR = '#f16c7f'
+const PAD_COLOR = '#b384bb'
+const BALL_COLOR = '#a6ccf5'
+const FRAME_COLOR = '#d5f692'
+const VOID_COLOR = '#f5f6f8'
 
 // const gridInit = [
 //     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],

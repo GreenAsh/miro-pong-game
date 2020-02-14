@@ -234,8 +234,8 @@ styles[BRICK] = {
 	style: {
 		borderWidth: 0,
 		borderStyle: 'none',
-		backgroundColor: BRICK,
-		stickerBackgroundColor: BRICK,
+		backgroundColor: BLOCK_COLOR,
+		stickerBackgroundColor: BLOCK_COLOR,
 		textColor: BLOCK_COLOR
 	}
 }
