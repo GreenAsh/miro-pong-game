@@ -100,7 +100,7 @@
 		started: false,
 		ballTicker: 0,
 		init: function () {
-			this.socket = new WebSocket("wss://855c8279.ngrok.io", "protocolOne");
+			this.socket = new WebSocket("wss://greenash-miro-pong-game.glitch.me/", "protocolOne");
 			this.socket.onmessage = app.onmessage;
 		},
 		onmessage: function (event) {
