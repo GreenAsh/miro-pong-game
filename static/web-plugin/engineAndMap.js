@@ -213,6 +213,7 @@ styles[WALL] = {
 		borderWidth: 0,
 		borderStyle: 'none',
 		backgroundColor: FRAME_COLOR,
+		stickerBackgroundColor: FRAME_COLOR,
 		textColor: FRAME_COLOR
 	}
 };
@@ -223,6 +224,7 @@ styles[VOID] = {
 		borderWidth: 0,
 		borderStyle: 'none',
 		backgroundColor: VOID_COLOR,
+		stickerBackgroundColor: VOID_COLOR,
 		textColor: VOID_COLOR
 	}
 }
@@ -233,6 +235,7 @@ styles[BRICK] = {
 		borderWidth: 0,
 		borderStyle: 'none',
 		backgroundColor: BRICK,
+		stickerBackgroundColor: BRICK,
 		textColor: BLOCK_COLOR
 	}
 }
@@ -243,6 +246,7 @@ styles[PAD] = {
 		borderWidth: 0,
 		borderStyle: 'none',
 		backgroundColor: PAD_COLOR,
+		stickerBackgroundColor: PAD_COLOR,
 		textColor: PAD_COLOR
 	}
 }
@@ -253,6 +257,7 @@ styles[BALL] = {
 		borderWidth: 0,
 		borderStyle: 'none',
 		backgroundColor: BALL_COLOR,
+		stickerBackgroundColor: BALL_COLOR,
 		textColor: BALL_COLOR
 	}
 }
