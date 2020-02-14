@@ -1,4 +1,4 @@
-const BLOCK_COLOR = '#f16c7f'
+const BLOCK_COLOR = '#ea94bb'
 const PAD_COLOR = '#b384bb'
 const BALL_COLOR = '#a6ccf5'
 const FRAME_COLOR = '#d5f692'
