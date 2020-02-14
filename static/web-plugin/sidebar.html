@@ -2,303 +2,372 @@
 <html lang="en">
 
 <head>
-	<meta charset="UTF-8">
-	<link rel="stylesheet" type="text/css" href="https://realtimeboard.com/app/static/rtb.uikit.css">
-	<script src="https://realtimeboard.com/app/static/rtb.sdk.1.0.js"></script>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="https://realtimeboard.com/app/static/rtb.uikit.css">
+    <!--	<script src="https://realtimeboard.com/app/static/rtb.sdk.1.0.js"></script>-->
+    <script type="text/javascript" src="https://miro.com/app/static/sdk.1.1.js"></script>
 
-	<style>
-		.rtb-sidebar-caption {
-			font-size: 14px;
-			font-weight: bold;
-			color: rgba(0, 0, 0, 0.8);
-			padding: 24px 0 0 24px;
-		}
+    <style>
+        .rtb-sidebar-caption {
+            font-size: 14px;
+            font-weight: bold;
+            color: rgba(0, 0, 0, 0.8);
+            padding: 24px 0 0 24px;
+        }
 
-		.actions {
-			padding: 20px 24px 0 24px;
-		}
+        .actions {
+            padding: 20px 24px 0 24px;
+        }
 
-		button {
-			height: 32px;
-			border-radius: 4px;
-			font-size: 12px;
-			font-weight: bold;
-			line-height: 30px;
-			text-align: center;
-			color: #fff;
-			min-width: 65px;
-			background-color: #2a79ff;
-			overflow: hidden;
-			text-overflow: ellipsis;
-		}
-	</style>
-	<script src="sound.js"></script>
-	<script src="global.js"></script>
-	<script src="mapData.js"></script>
-	<script src="engineAndMap.js"></script>
-	<script src="setup.js"></script>
-	<script src="input.js"></script>
+        button {
+            height: 32px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            line-height: 30px;
+            text-align: center;
+            color: #fff;
+            min-width: 65px;
+            background-color: #2a79ff;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    </style>
+    <script src="sound.js"></script>
+    <script src="global.js"></script>
+    <script src="mapData.js"></script>
+    <script src="engineAndMap.js"></script>
+    <!--	<script src="setup.js"></script>-->
+    <script src="input.js"></script>
+    <script src="tests/create-widgets.js"></script>
 </head>
 
 <body>
-	<div class="rtb-sidebar-caption">Ping-pong</div>
-	<div class="actions">
-		<center>
-			<br><br>
-			<button onclick="app.clean()" style="width: 120px;">Clean</button><br />
-			<h2 style="">Network</h2>
-			<button onclick="app.createSession()" style="width: 120px;">be Hostest!</button><br />
-			<button onclick="app.run()" style="width: 120px;">Start [Host]!</button><br />
-			<button onclick="app.stop()" style="width: 120px;">Stop [Host]!</button><br />
-			<h2 id="serverStatus" style=""></h2>
-			<button onclick="app.join()" style="width: 120px;">Join... as client!</button><br />
-			<h2 id="errorMessage" style=""></h2>
-			<br><br>
-			<h2 id="controls" style="display:none;">Use up/down arrows and A/Z keys to control pad</h2>
-			<h2 id="you-are-dead" style="display:none; background-color: red;">You are dead, reopen sidebar and click 'Play'!</h2>
-			<h2 id="click-for-focus" style="display:none;">Click on sidebar <br>to control pad</h2>
-		</center>
-	</div>
-	<script>
-		'use strict'
-		const STOPPED = 0;
-		const AWAITING = 1;
-		const STARTED = 2;
+<div class="rtb-sidebar-caption">Ping-pong</div>
+<div class="actions" style="text-align: center;">
+    <br><br>
+    <button onclick="app.clean()/* app.test.clean()*/ /* ToDo */ " style="width: 120px;">Clean</button>
+    <br/>
+    <h2 style="">Network</h2>
+    <button onclick="app.createSession()" style="width: 120px;">be Hostest!</button>
+    <br/>
+    <button onclick="app.run()" style="width: 120px;">Start [Host]!</button>
+    <br/>
+    <button onclick="app.stop()" style="width: 120px;">Stop [Host]!</button>
+    <br/>
+    <h2 id="serverStatus" style=""></h2>
+    <button onclick="app.join()" style="width: 120px;">Join... as client!</button>
+    <br/>
+    <h2 id="errorMessage" style=""></h2>
+    <br><br>
+    <h2 id="controls" style="display:none;">Use up/down arrows and A/Z keys to control pad</h2>
+    <h2 id="you-are-dead" style="display:none; background-color: red;">You are dead, reopen sidebar and click 'Play'!</h2>
+    <h2 id="click-for-focus" style="display:none;">Click on sidebar <br>to control pad</h2>
+</div>
+<!-- HOST CODE -->
+<script>
+	'use strict'
+	const STOPPED = 0;
+	const AWAITING = 1;
+	const STARTED = 2;
 
-		const PREPARE = "prepare";
-		const START = "start";
-		const STOP = "stop";
-		const STATE = "state";
-		const JOIN = "join";
-		const MOVE_LEFT = "moveLeft";
-		const MOVE_RIGHT = "moveRight";
+	const PREPARE = "prepare";
+	const START = "start";
+	const STOP = "stop";
+	const STATE = "state";
+	const JOIN = "join";
+	const MOVE_LEFT = "moveLeft";
+	const MOVE_RIGHT = "moveRight";
 
-		const BALL_LOOP = 100 ;
-		const REDRAW_LOOP = 50;
+	const TEST_START = "creator-start-test";
+	const TEST_STOP = "creator-stop-test";
+	const CLEAR_BOARD = "creator-clear-board";
 
-		let app = {
-			topScore: 0,
-			bottomScore: 0,
-			hosted: false,
-			joined: false,
-			lastCommand: null,
-			lastMessage: null,
-			ballLoop: null,
-			readrawLoop: null,
-			ballDirection: null,
-			socket: null,
-			started: false,
-			ballTicker: 0,
-			init: function(){
-				this.socket = new WebSocket("wss://5f804b81.ngrok.io", "protocolOne");
-				this.socket.onmessage = app.onmessage;
-			},
-			onmessage: function(event){
-				console.log(event.data);
-				app.lastMessage = JSON.parse(event.data);
-				let message = "Unknown status";
-				switch (app.lastMessage.state) {
-					case STOPPED:
-						app.stopGame();
-						message = "Game is Stopped, please create session";
+	const BALL_LOOP = 100;
+	const REDRAW_LOOP = 100;
+
+	let app = {
+		topScore: 0,
+		bottomScore: 0,
+		hosted: false,
+		joined: false,
+		lastCommand: null,
+		lastMessage: null,
+		ballLoop: null,
+		readrawLoop: null,
+		ballDirection: null,
+		socket: null,
+		started: false,
+		ballTicker: 0,
+		init: function () {
+			this.socket = new WebSocket("wss://855c8279.ngrok.io", "protocolOne");
+			this.socket.onmessage = app.onmessage;
+		},
+		onmessage: function (event) {
+			console.log(event.data);
+			app.lastMessage = JSON.parse(event.data);
+			let message = "Unknown status";
+			switch (app.lastMessage.state) {
+				case STOPPED:
+				    if (app.started === true) {
+                        prepareUI(false);
+                    }
+					app.stopGame(); //ToDo
+					//app.test.stop();
+					message = "Game is Stopped, please create session";
+					break;
+				case AWAITING:
+					message = "Game is in awaiting status";
+					break;
+				case STARTED:
+                    if (app.started === false) {
+                        prepareUI(true);
+                    }
+					app.startGame(); //ToDo
+					//app.test.start();
+					message = "Game is started";
+					break;
+			}
+
+			if (app.lastMessage.host === true) {
+				app.hosted = true;
+				//ToDo responsibility
+				//renderer.init();
+				document.getElementById("serverStatus").innerText = "You are the host";
+			} else {
+				document.getElementById("serverStatus").innerText = message;
+			}
+			if (app.lastMessage.errorMessage != null) {
+				document.getElementById("errorMessage").innerText = app.lastMessage.errorMessage;
+			}
+			// return; //ToDo
+
+			if (app.lastMessage.command != null) {
+				switch (app.lastMessage.command) {
+					case "joined":
+						if (app.lastCommand === JOIN) {
+							app.joined = true;
+						}
 						break;
-					case AWAITING:
-						message = "Game is in awaiting status";
-						break;
-					case STARTED:
-						app.startGame();
-						message = "Game is started";
-						break;
-				}
-				if (app.lastMessage.host === true){
-					app.hosted = true;
-					//ToDo responsibility
-					renderer.init();
-					document.getElementById("serverStatus").innerText = "You are the host";
-				} else {
-					document.getElementById("serverStatus").innerText = message;
-				}
-				if (app.lastMessage.errorMessage != null){
-					document.getElementById("errorMessage").innerText = app.lastMessage.errorMessage;
-				}
-				if (app.lastMessage.command != null){
-					switch (app.lastMessage.command) {
-						case "joined":
-							if (app.lastCommand === JOIN){
-								app.joined = true;
-							}
-							break;
-						case MOVE_LEFT:
-							if (app.started === true && app.hosted === true && world.pads[0].move(-1, 0)){
-								renderer.redrawMap();
-							}
-							break;
-						case MOVE_RIGHT:
-							if (app.started === true && app.hosted === true && world.pads[0].move(1, 0)){
-								renderer.redrawMap();
-							}
-							break;
-					}
-				}
-			},
-			createSession: function() {
-				this.lastCommand = PREPARE;
-				this.socket.send(PREPARE);
-			},
-			run: function(){
-				this.lastCommand = START;
-				this.socket.send(START)
-			},
-			stop: function(){
-				this.lastCommand = STOP;
-				this.socket.send(STOP)
-			},
-			join: function () {
-				this.lastCommand = JOIN;
-				this.socket.send(JOIN)
-			},
-			moveLeft: function(){
-				if (this.lastMessage.state === STARTED && this.joined === true) {
-					this.socket.send(MOVE_LEFT);
-				}
-			},
-			moveRight: function(){
-				if (this.lastMessage.state === STARTED && this.joined === true) {
-					this.socket.send(MOVE_RIGHT);
-				}
-			},
-			clean: function(){
-				if ((app.lastMessage == null || app.lastMessage.state === STOPPED) && app.started === false){
-					this.topScore = 0;
-					this.bottomScore = 0;
-					this.ballTicker = 0;
-					renderer.init();
-					this.stopGame();
-				}
-			},
-			stopGame: function(){
-				if (app.ballLoop){
-					clearInterval(app.ballLoop);
-					document.onkeydown = function(){};
-				}
-				if (app.readrawLoop){
-					clearInterval(app.readrawLoop);
-					document.onkeydown = function(){};
-				}
-				app.started = false;
-			},
-			startGame: function(){
-				if (app.started === false) {
-					app.started = true;
-					if (app.joined) {
-						//ToDo alalala
-						// mapDeepCopy(world.initialMap, world.dirtyMap);
-						// world.ball.init(5, 16);
-						// world.pads[0].init(4, 1);
-						// world.pads[1].init(4, 17);
-						input.asClient(app);
-					}
-					if (app.hosted === true) {
-						input.asHost();
-						app.ballDirection = {x: Math.floor(Math.random() * 2) * 2 - 1, y: Math.floor(Math.random() * 2) * 2 - 1};
-						app.redrawLoop = setInterval(() => {
+					case MOVE_LEFT:
+						if (app.started === true && app.hosted === true && world.pads[0].move(-1, 0)) {
 							renderer.redrawMap();
-						}, REDRAW_LOOP);
-
-						app.ballLoop = setInterval(() => {
-							if (app.ballTicker > 0){
-								app.ballTicker++;
-								if (app.ballTicker % 4 === 0) {
-									let nextFill = VOID;
-									switch (world.map[world.ball.getCurPos().x][world.ball.getCurPos().y]) {
-										case BALL:
-											nextFill = VOID;
-											break;
-										default:
-											nextFill = BALL;
-											break;
-									}
-									world.dirtyMap[world.ball.getCurPos().x][world.ball.getCurPos().y] = nextFill;
-								}
-								if (app.ballTicker > 11){
-									world.dirtyMap[world.ball.getCurPos().x][world.ball.getCurPos().y] = BALL;
-									app.ballTicker = 0;
-								}
-								//ToDo this return
-								return;
-							}
-							if (world.ball.move(app.ballDirection.x, app.ballDirection.y) === false) {
-								const x = app.ballDirection.x;
-								const y = app.ballDirection.y;
-								//ToDo
-								// 1, 18 // 12
-								if (world.ball.getCurPos().y + y < 1) {
-									let scoreX = 18;
-									let score = ++app.bottomScore;
-									let scoreFill = PAD;
-									score = 16 - Math.min(score, 5);
-									for (let scoreY = 16; scoreY > score; scoreY--){
-										world.dirtyMap[scoreX][scoreY] = scoreFill;
-									}
-									world.ball.move(parseInt((WIDTH - world.ball.width) / 2) + 1 - world.ball.getCurPos().x, 8 - world.ball.getCurPos().y);
-									app.ballDirection.x = Math.floor(Math.random() * 2) * 2 - 1;
-									app.ballDirection.y = 1;
-									app.ballTicker = 1;
-									return;
-								} else if (world.ball.getCurPos().y + y >= HEIGHT) {
-									let scoreX = 1;
-									let score =  ++app.topScore;
-									let scoreFill = BALL;
-									score = 12 + Math.min(score, 5);
-									for (let scoreY = 12; scoreY < score; scoreY++){
-										world.dirtyMap[scoreX][scoreY] = scoreFill;
-									}
-									world.ball.move(parseInt((WIDTH - world.ball.width) / 2) + 1 - world.ball.getCurPos().x, HEIGHT - 8 - world.ball.getCurPos().y);
-									app.ballDirection.x = Math.floor(Math.random() * 2) * 2 - 1;
-									app.ballDirection.y = -1;
-									app.ballTicker = 1;
-									return;
-								}
-								//ToDo return in previous if
-								const width = world.ball.width
-								if (world.ball.getCurPos().x + x < 0 || (world.ball.getCurPos().x + x + width) > WIDTH || world.map[world.ball.getCurPos().x
-								+ x][world.ball.getCurPos().y] !== VOID) {
-									app.ballDirection.x = -x;
-								}
-								const height = world.ball.height
-								if (world.ball.getCurPos().y + y < 0 || (world.ball.getCurPos().y + y + height) > HEIGHT
-									|| world.map[world.ball.getCurPos().x][world.ball.getCurPos().y + y] !== VOID) {
-									app.ballDirection.y = -y;
-								}
-								let xCollision = world.map[world.ball.getCurPos().x + x][world.ball.getCurPos().y];
-								let yCollision = world.map[world.ball.getCurPos().x][world.ball.getCurPos().y + y];
-								let xyCollision = world.map[world.ball.getCurPos().x + x][world.ball.getCurPos().y + y];
-
-								if (xCollision === WALL || yCollision === WALL
-									|| xCollision === BRICK || yCollision === BRICK
-									|| xyCollision === WALL || xyCollision === BRICK ){
-									sound.plop.play();
-								}
-								if (xCollision === PAD || yCollision === PAD || xyCollision === PAD){
-									sound.beep.play();
-								}
-								if (xCollision === INVISIBLE || yCollision === INVISIBLE || xyCollision === INVISIBLE){
-									sound.peep.play();
-								}
-								if (world.ball.move(app.ballDirection.x, app.ballDirection.y) === false) {
-									app.ballDirection.x = -x;
-									app.ballDirection.y = -y;
-									world.ball.move(app.ballDirection.x, app.ballDirection.y);
-								}
-							}
-						}, BALL_LOOP);
-					}
+						}
+						break;
+					case MOVE_RIGHT:
+						if (app.started === true && app.hosted === true && world.pads[0].move(1, 0)) {
+							renderer.redrawMap();
+						}
+						break;
 				}
 			}
-		};
+		},
+		createSession: function () {
+			this.lastCommand = PREPARE;
+			this.socket.send(PREPARE);
+		},
+		run: function () {
+			this.lastCommand = START;
+			this.socket.send(START)
+		},
+		stop: function () {
+			this.lastCommand = STOP;
+			this.socket.send(STOP)
+		},
+		join: function () {
+			this.lastCommand = JOIN;
+			this.socket.send(JOIN)
+		},
+		moveLeft: function () {
+			if (this.lastMessage.state === STARTED && this.joined === true) {
+				this.socket.send(MOVE_LEFT);
+			}
+		},
+		moveRight: function () {
+			if (this.lastMessage.state === STARTED && this.joined === true) {
+				this.socket.send(MOVE_RIGHT);
+			}
+		},
+		clean: function () {
+			if ((app.lastMessage == null || app.lastMessage.state === STOPPED) && app.started === false) {
+				this.topScore = 0;
+				this.bottomScore = 0;
+				this.ballTicker = 0;
+				renderer.init();
+				this.stopGame();
+			}
+		},
+		stopGame: function () {
+			if (app.ballLoop) {
+				clearInterval(app.ballLoop);
+				document.onkeydown = function () {};
+			}
+			if (app.readrawLoop) {
+				clearInterval(app.readrawLoop);
+				document.onkeydown = function () {};
+			}
+			app.started = false;
+		},
+		startGame: async function () {
+			if (app.started === false) {
+				app.started = true;
+				if (app.joined) {
+					//ToDo alalala
+					// mapDeepCopy(world.initialMap, world.dirtyMap);
+					// world.ball.init(5, 16);
+					// world.pads[0].init(4, 1);
+					// world.pads[1].init(4, 17);
+                    console.log('started as client');
+					input.asClient(app);
+				}
+				if (app.hosted === true) {
+					input.asHost();
+					app.ballDirection = {x: Math.floor(Math.random() * 2) * 2 - 1, y: Math.floor(Math.random() * 2) * 2 - 1};
+					app.redrawLoop = setInterval(() => {
+						renderer.redrawMap();
+					}, REDRAW_LOOP);
 
-		app.init();
-	</script>
+					app.ballLoop = setInterval(() => {
+						if (app.ballTicker > 0) {
+							app.ballTicker++;
+							if (app.ballTicker % 4 === 0) {
+								let nextFill;
+								// noinspection JSRedundantSwitchStatement
+								switch (world.map[world.ball.getCurPos().x][world.ball.getCurPos().y]) {
+									case BALL:
+										nextFill = VOID;
+										break;
+									default:
+										nextFill = BALL;
+										break;
+								}
+								world.dirtyMap[world.ball.getCurPos().x][world.ball.getCurPos().y] = nextFill;
+							}
+							if (app.ballTicker > 11) {
+								world.dirtyMap[world.ball.getCurPos().x][world.ball.getCurPos().y] = BALL;
+								app.ballTicker = 0;
+							}
+							//ToDo this return
+							return;
+						}
+						if (world.ball.move(app.ballDirection.x, app.ballDirection.y) === false) {
+							const x = app.ballDirection.x;
+							const y = app.ballDirection.y;
+							//ToDo
+							// 1, 18 // 12
+							if (world.ball.getCurPos().y + y < 0) {
+								let scoreX = 18;
+								let score = ++app.bottomScore;
+								let scoreFill = PAD;
+								score = 16 - Math.min(score, 5);
+								for (let scoreY = 16; scoreY > score; scoreY--) {
+									world.dirtyMap[scoreX][scoreY] = scoreFill;
+								}
+								world.ball.move(Math.round((WIDTH - world.ball.width) / 2) + 1 - world.ball.getCurPos().x, 8 - world.ball.getCurPos().y);
+								app.ballDirection.x = Math.floor(Math.random() * 2) * 2 - 1;
+								app.ballDirection.y = 1;
+								app.ballTicker = 1;
+								return;
+							} else if (world.ball.getCurPos().y + y >= HEIGHT) {
+								let scoreX = 1;
+								let score = ++app.topScore;
+								let scoreFill = BALL;
+								score = 12 + Math.min(score, 5);
+								for (let scoreY = 12; scoreY < score; scoreY++) {
+									world.dirtyMap[scoreX][scoreY] = scoreFill;
+								}
+								world.ball.move(Math.round((WIDTH - world.ball.width) / 2) + 1 - world.ball.getCurPos().x, HEIGHT - 8 - world.ball.getCurPos().y);
+								app.ballDirection.x = Math.floor(Math.random() * 2) * 2 - 1;
+								app.ballDirection.y = -1;
+								app.ballTicker = 1;
+								return;
+							}
+							//ToDo return in previous if
+							const width = world.ball.width
+							if (world.ball.getCurPos().x + x < 0
+                                || (world.ball.getCurPos().x + x + width) > WIDTH
+                                || world.map[world.ball.getCurPos().x + x][world.ball.getCurPos().y] !== VOID
+                            ) {
+								app.ballDirection.x = -x;
+							}
+							const height = world.ball.height
+							if (world.ball.getCurPos().y + y < 0
+                                || (world.ball.getCurPos().y + y + height) > HEIGHT
+								|| world.map[world.ball.getCurPos().x][world.ball.getCurPos().y + y] !== VOID
+                            ) {
+								app.ballDirection.y = -y;
+							}
+							let xCollision = world.map[world.ball.getCurPos().x + x][world.ball.getCurPos().y];
+							let yCollision = world.map[world.ball.getCurPos().x][world.ball.getCurPos().y + y];
+							let xyCollision = world.map[world.ball.getCurPos().x + x][world.ball.getCurPos().y + y];
+
+							if (xCollision === WALL || yCollision === WALL || xyCollision === WALL
+                                || xCollision === BRICK || yCollision === BRICK || xyCollision === BRICK) {
+								sound.plop.play();
+							}
+							if (xCollision === PAD || yCollision === PAD || xyCollision === PAD) {
+								sound.beep.play();
+							}
+							if (xCollision === INVISIBLE || yCollision === INVISIBLE || xyCollision === INVISIBLE
+                                || xCollision === BALL || yCollision === BALL || xyCollision === BALL
+                            ) {
+								sound.peep.play();
+							}
+							if (world.ball.move(app.ballDirection.x, app.ballDirection.y) === false) {
+								app.ballDirection.x = -x;
+								app.ballDirection.y = -y;
+								world.ball.move(app.ballDirection.x, app.ballDirection.y);
+							}
+						}
+					}, BALL_LOOP);
+				}
+			}
+		},
+
+        test: {
+			start: function () {
+				test.creator.start('test', 0);
+			},
+            stop: function () {
+                test.creator.stop();
+			},
+            clean: function () {
+                test.creator.clear();
+			}
+        }
+	};
+
+	app.init();
+
+    async function prepareUI(started) {
+        const tlWidget = await miro.board.widgets.get({ id: world.shapes[0][0]})
+        const brWidget = await miro.board.widgets.get({ id: world.shapes[WIDTH - 1][HEIGHT - 1]})
+        const viewport = {
+            x: tlWidget.bounds.left,
+            y: tlWidget.bounds.top,
+            width: brWidget.bounds.right - tlWidget.bounds.left,
+            height: brWidget.bounds.bottom - tlWidget.bounds.top
+        };
+        const padding = {
+            top: 60,
+            left: 80,
+            right: 80,
+            bottom: 70,
+        };
+        if (started){
+            await miro.board.ui.__limitToolbarMode('commentor')
+            await miro.board.ui.__hideButtonsPanels('all');
+            await miro.board.__disableLeftClickOnCanvas();
+            await miro.board.viewport.__mask(viewport, padding);
+            await miro.board.viewport.setViewport(viewport, padding);
+        } else {
+            await miro.board.viewport.__unmask()
+            await miro.board.ui.__showButtonsPanels('all')
+            await miro.board.ui.__clearToolbarModeLimit()
+            await miro.board.__enableLeftClickOnCanvas()
+        }
+    }
+</script>
 </body>
 
 </html>

@@ -1,4 +1,4 @@
-var input = {
+const input = {
 	asHost: function () {
 		document.onkeydown = async function (e) {
 			e = e || window.event;

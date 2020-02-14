@@ -6,6 +6,7 @@ Handy playground for playing with RealtimeBoard API and Webhooks.
 1) Run `npm install`
 2) Run `npm run start`
 3) Run `ngrok http 3000`
+4) Run `http-server ./` for serving client plugin url
 4) Edit `config.js`:
     - Set BASE_URL from ngrok
     - Set CLIENT_SECRET from the App settings

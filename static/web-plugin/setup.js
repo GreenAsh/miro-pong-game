@@ -36,53 +36,53 @@ async function setUp() {
     // spawnFrames()
 }
 
-async function spawnPad() {
-    currentPlayer.widget = await rtb.board.widgets.shapes.create(Object.assign({},
-        padDraft,
-        {
-            x: BLOCK_STEP * Math.floor(gridInit[0].length / 2),
-            y: BLOCK_STEP * 14
-        }
-    ))
-}
-
-async function spawnBall() {
-    ball.widget = await rtb.board.widgets.shapes.create(Object.assign({},
-        ballDraft,
-        {
-            x: BLOCK_STEP * Math.floor(gridInit[0].length / 2),
-            y: BLOCK_STEP * 13
-        }
-    ))
-}
-
-async function spawnFrames() {
-    upFrameWidget = await rtb.board.widgets.shapes.create(Object.assign({},
-        horizontalFrame,
-        {
-            x: BLOCK_STEP * gridInit[0].length / 2 - BLOCK_STEP / 2,
-            y: - BLOCK_STEP
-        }
-    ))
-    downFrameWidget = await rtb.board.widgets.shapes.create(Object.assign({},
-        horizontalFrame,
-        {
-            x: BLOCK_STEP * gridInit[0].length / 2 - BLOCK_STEP / 2,
-            y: BLOCK_STEP * 15
-        }
-    ))
-    leftFrameWidget = await rtb.board.widgets.shapes.create(Object.assign({},
-        verticalFrame,
-        {
-            x: - BLOCK_STEP,
-            y: BLOCK_STEP * 7
-        }
-    ))
-    rightFrameWidget = await rtb.board.widgets.shapes.create(Object.assign({},
-        verticalFrame,
-        {
-            x: BLOCK_STEP * gridInit[0].length,
-            y: BLOCK_STEP * 7
-        }
-    ))
-}
+// async function spawnPad() {
+//     currentPlayer.widget = await rtb.board.widgets.shapes.create(Object.assign({},
+//         padDraft,
+//         {
+//             x: BLOCK_STEP * Math.floor(gridInit[0].length / 2),
+//             y: BLOCK_STEP * 14
+//         }
+//     ))
+// }
+//
+// async function spawnBall() {
+//     ball.widget = await rtb.board.widgets.shapes.create(Object.assign({},
+//         ballDraft,
+//         {
+//             x: BLOCK_STEP * Math.floor(gridInit[0].length / 2),
+//             y: BLOCK_STEP * 13
+//         }
+//     ))
+// }
+//
+// async function spawnFrames() {
+//     upFrameWidget = await rtb.board.widgets.shapes.create(Object.assign({},
+//         horizontalFrame,
+//         {
+//             x: BLOCK_STEP * gridInit[0].length / 2 - BLOCK_STEP / 2,
+//             y: - BLOCK_STEP
+//         }
+//     ))
+//     downFrameWidget = await rtb.board.widgets.shapes.create(Object.assign({},
+//         horizontalFrame,
+//         {
+//             x: BLOCK_STEP * gridInit[0].length / 2 - BLOCK_STEP / 2,
+//             y: BLOCK_STEP * 15
+//         }
+//     ))
+//     leftFrameWidget = await rtb.board.widgets.shapes.create(Object.assign({},
+//         verticalFrame,
+//         {
+//             x: - BLOCK_STEP,
+//             y: BLOCK_STEP * 7
+//         }
+//     ))
+//     rightFrameWidget = await rtb.board.widgets.shapes.create(Object.assign({},
+//         verticalFrame,
+//         {
+//             x: BLOCK_STEP * gridInit[0].length,
+//             y: BLOCK_STEP * 7
+//         }
+//     ))
+// }

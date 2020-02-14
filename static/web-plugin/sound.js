@@ -1,4 +1,4 @@
-let sound = {
+const sound = {
 	beep: null, // paddle
 	peep: null, // score
 	plop: null, // wall

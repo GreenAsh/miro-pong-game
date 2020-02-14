@@ -2,20 +2,18 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const cors = require('cors')
 const mustacheExpress = require('mustache-express')
-const https = require('https')
 const http = require('http')
-const fs = require('fs')
 
-const api = require('./api')
-const db = require('./db')
-const events = require('./events')
+// const api = require('./api')
+// const db = require('./db')
+// const events = require('./events')
 const config = require('./config')
 
 const app = express()
 const port = 3000
 
 app.engine('html', mustacheExpress())
-app.use(cors())
+// app.use(cors())
 app.use('/static', express.static('static'))
 app.set('view engine', 'html')
 app.set('views', __dirname + '/../views')
@@ -25,28 +23,28 @@ app.use(bodyParser.urlencoded({extended: true}))
 app.get('/', (req, res) => {
 	res.render('index', {baseUrl: config.BASE_URL})
 })
-
-app.get('/playground', async (req, res) => {
-	res.render('playground')
-})
-
-app.get('/oauth', async (req, res) => {
-	const response = await api.oauth.getToken(req.query.code, req.query.client_id)
-	console.log('/oauth/ response = ', response)
-	if (response) {
-		db.addAuthorization(response)
-	}
-	res.send('response: ' + JSON.stringify(response))
-})
-
-app.post('/events', (req, res) => {
-	const verificationToken = req.get('X-RTB-Verification-Token')
-	if (verificationToken === config.VERIFICATION_TOKEN) {
-		events.processEvent(req.body, res)
-	} else {
-		res.status(200).send()
-	}
-})
+//
+// app.get('/playground', async (req, res) => {
+// 	res.render('playground')
+// })
+//
+// app.get('/oauth', async (req, res) => {
+// 	const response = await api.oauth.getToken(req.query.code, req.query.client_id)
+// 	console.log('/oauth/ response = ', response)
+// 	if (response) {
+// 		db.addAuthorization(response)
+// 	}
+// 	res.send('response: ' + JSON.stringify(response))
+// })
+//
+// app.post('/events', (req, res) => {
+// 	const verificationToken = req.get('X-RTB-Verification-Token')
+// 	if (verificationToken === config.VERIFICATION_TOKEN) {
+// 		events.processEvent(req.body, res)
+// 	} else {
+// 		res.status(200).send()
+// 	}
+// })
 
 // app.listen(port, () => {
 // 	console.log(`App listening on port ${port}`)
@@ -90,7 +88,7 @@ wss.on('connection', function connection(ws) {
 	ws.on('message', function incoming(data) {
 		switch (data) {
 			case "prepare":
-				if (game.state === STOPPED){
+				if (game.state === STOPPED) {
 					game.state = AWAITING;
 					game.initiator = ws;
 					wss.clients.forEach(function each(client) {
@@ -117,7 +115,7 @@ wss.on('connection', function connection(ws) {
 				}
 				break;
 			case "start":
-				if (game.state === AWAITING && game.initiator === ws){
+				if (game.state === AWAITING && game.initiator === ws) {
 					game.state = STARTED;
 					wss.broadcast(JSON.stringify({
 						state: game.state
@@ -130,7 +128,7 @@ wss.on('connection', function connection(ws) {
 				}
 				break;
 			case "stop":
-				if (game.state === STARTED && game.initiator === ws){
+				if (game.state === STARTED && game.initiator === ws) {
 					game.state = STOPPED;
 					game.initiator = null;
 					wss.broadcast(JSON.stringify({
@@ -156,7 +154,7 @@ wss.on('connection', function connection(ws) {
 				}))
 				break;
 			case "sync":
-				if (game.state === AWAITING && game.initiator === ws){
+				if (game.state === AWAITING && game.initiator === ws) {
 					wss.clients.forEach(function each(client) {
 						if (client !== ws && client.readyState === WebSocket.OPEN) {
 							client.send(JSON.stringify({
@@ -168,7 +166,7 @@ wss.on('connection', function connection(ws) {
 				}
 				break;
 			case "join":
-				if (game.state === AWAITING && game.initiator !== ws){
+				if (game.state === AWAITING && game.initiator !== ws) {
 					ws.send(JSON.stringify({
 						state: game.state,
 						command: "joined"
@@ -176,7 +174,7 @@ wss.on('connection', function connection(ws) {
 				}
 				break;
 			default:
-				if (game.state === STARTED && game.initiator != null){
+				if (game.state === STARTED && game.initiator != null) {
 					game.initiator.send(JSON.stringify({
 						state: game.state,
 						command: data
